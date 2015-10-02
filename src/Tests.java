@@ -313,6 +313,11 @@ public class Tests {
         System.out.println(testString);
       }
 
+      // if score ends up being negative, just give 0
+      if (score < 0) {
+        score = 0;
+      }
+
       if (score == MAXSCORE) {
         scoreSheet.addSection(testName, score, MAXSCORE, "");
       } else {
