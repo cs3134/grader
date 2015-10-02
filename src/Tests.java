@@ -1,11 +1,10 @@
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -22,333 +21,323 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 public class Tests {
 
-	public static ScoreSheet runTests(ScoreSheet scoreSheet) throws IOException {
-		Properties properties = new Properties();
-		FileInputStream input = new FileInputStream("config.prop");
+  public static ScoreSheet runTests(ScoreSheet scoreSheet) throws IOException {
+    Properties properties = new Properties();
+    FileInputStream input = new FileInputStream("config.prop");
 
-		properties.load(input);
+    properties.load(input);
 
-		scoreSheet.className = properties.getProperty("className");
-		scoreSheet.homeworkName = properties.getProperty("homeworkName");
-		scoreSheet.studentMax = Integer.parseInt(properties
-				.getProperty("studentMax"));
-		int timeLimitSeconds = Integer.parseInt(properties
-				.getProperty("timeLimitSeconds"));
+    scoreSheet.className = properties.getProperty("className");
+    scoreSheet.homeworkName = properties.getProperty("homeworkName");
+    scoreSheet.studentMax = Integer.parseInt(properties.getProperty("studentMax"));
+    int timeLimitSeconds = Integer.parseInt(properties.getProperty("timeLimitSeconds"));
 
-		Callable<ScoreSheet> tests = new Callable<ScoreSheet>() {
-			@Override
-			public ScoreSheet call() throws Exception {
-				return tests(scoreSheet);
-			}
-		};
+    Callable<ScoreSheet> tests = new Callable<ScoreSheet>() {
+      @Override
+      public ScoreSheet call() throws Exception {
+        return tests(scoreSheet);
+      }
+    };
 
-		ExecutorService executor = Executors.newSingleThreadExecutor();
-		Future<ScoreSheet> future = executor.submit(tests);
-		executor.shutdown();
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    Future<ScoreSheet> future = executor.submit(tests);
+    executor.shutdown();
 
-		try {
-			future.get(timeLimitSeconds, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			scoreSheet.errorMessage = "Timed out";
-			System.out.println(scoreSheet.toJSONString());
-			System.exit(1);
-		} catch (ExecutionException e) {
-			scoreSheet.errorMessage = "Timed out";
-			System.out.println(scoreSheet.toJSONString());
-			System.exit(1);
-		} catch (TimeoutException e) {
-			scoreSheet.errorMessage = "Timed out";
-			System.out.println(scoreSheet.toJSONString());
-			System.exit(1);
-		}
+    try {
+      future.get(timeLimitSeconds, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      scoreSheet.errorMessage = "Timed out";
+      System.out.println(scoreSheet.toJSONString());
+      System.exit(1);
+    } catch (ExecutionException e) {
+      scoreSheet.errorMessage = "Timed out";
+      System.out.println(scoreSheet.toJSONString());
+      System.exit(1);
+    } catch (TimeoutException e) {
+      scoreSheet.errorMessage = "Timed out";
+      System.out.println(scoreSheet.toJSONString());
+      System.exit(1);
+    }
 
-		if (!executor.isTerminated()) {
-			executor.shutdownNow();
-		}
+    if (!executor.isTerminated()) {
+      executor.shutdownNow();
+    }
 
-		System.out.println(scoreSheet.toJSONString());
+    System.out.println(scoreSheet.toJSONString());
 
-		String postUrl = "http://jarvis.xyz/webhook/curl";
-		HttpPost post = new HttpPost(postUrl);
-		StringEntity postingString = new StringEntity(scoreSheet.toJSONString());
-		post.setEntity(postingString);
-		post.setHeader("Content-type", "application/json");
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		httpClient.execute(post);
+    String postUrl = "http://jarvis.xyz/webhook/curl";
+    HttpPost post = new HttpPost(postUrl);
+    StringEntity postingString = new StringEntity(scoreSheet.toJSONString());
+    post.setEntity(postingString);
+    post.setHeader("Content-type", "application/json");
+    HttpClient httpClient = HttpClientBuilder.create().build();
+    httpClient.execute(post);
 
-		return scoreSheet;
-	}
+    return scoreSheet;
+  }
 
-	private static String stackTraceToString(Exception e) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(e.getClass().getName() + "\n");
+  private static String stackTraceToString(Exception e) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(e.getClass().getName() + "\n");
 
-		int stackTraceCount = 0;
-		for (StackTraceElement element : e.getStackTrace()) {
-			sb.append(element.toString());
-			sb.append("\n");
-			stackTraceCount++;
-			if (stackTraceCount > 2) {
-				sb.append("Stack trace redacted...");
-				return sb.toString().trim();
-			}
-		}
-		return sb.toString().trim();
-	}
+    int stackTraceCount = 0;
+    for (StackTraceElement element : e.getStackTrace()) {
+      sb.append(element.toString());
+      sb.append("\n");
+      stackTraceCount++;
+      if (stackTraceCount > 2) {
+        sb.append("Stack trace redacted...");
+        return sb.toString().trim();
+      }
+    }
+    return sb.toString().trim();
+  }
 
-	/**
-	 * Graders, you should only edit this. No more.
-	 *
-	 * @param scoreSheet
-	 * @return
-	 */
-	private static ScoreSheet tests(ScoreSheet scoreSheet) {
-		// SimpleLinkedList indexOf()
-		indexOfTest(scoreSheet);
+  /**
+   * Graders, you should only edit this. No more.
+   *
+   * @param scoreSheet
+   * @return
+   */
+  private static ScoreSheet tests(ScoreSheet scoreSheet) {
 
-		// SimpleLinkedList reverse()
-		reverseTest(scoreSheet);
+    countOutQueueTestList(scoreSheet);
+    countOutQueueTestWinner(scoreSheet);
+    countOutQueueTestWinnerRec(scoreSheet);
+    try {
+      bufferTest(scoreSheet);
+    } catch (IOException e) {
+      System.out.println(stackTraceToString(e));
+      System.err.println("Skipping buffer test.");
+    }
+    return scoreSheet;
+  }
 
-		// SimpleLinkedList removeDuplicates()
-		removeDuplicatesTest(scoreSheet);
+  private static void countOutQueueTestList(ScoreSheet scoreSheet) {
+    String testName = "CountOut with Queue, list of players";
+    int MAXSCORE = 6;
 
-		// SimpleLinkedList interleave()
-		interleaveTest(scoreSheet);
+    int score = MAXSCORE;
 
-		// Range positive increment
-		rangePositiveTest(scoreSheet);
+    try {
+      // Homework example
+      if (!(compareCollections(Arrays.asList(3, 7, 1, 6, 2, 9, 8, 0, 5, 4), CountOut.play(10, 4))))
+        score -= 3;
+      // k == N
+      if (!(compareCollections(Arrays.asList(3, 0, 2, 1), CountOut.play(4, 4))))
+        score -= 3;
+      // k > N
+      if (!(compareCollections(Arrays.asList(0), CountOut.play(1, 4))))
+        score -= 3;
+      if (!(compareCollections(Arrays.asList(1, 0), CountOut.play(2, 4))))
+        score -= 3;
+      if (!(compareCollections(Arrays.asList(0, 1), CountOut.play(2, 3))))
+        score -= 3;
+      if (!(compareCollections(Arrays.asList(0, 2, 1), CountOut.play(3, 4))))
+        score -= 3;
+      // k == 1
+      if (!(compareCollections(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), CountOut.play(10, 1))))
+        score -= 3;
+    } catch (Exception e) {
+      scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
+    }
+    score = score < 0 ? 0 : score;
+    if (score == MAXSCORE) {
+      scoreSheet.addSection(testName, score, MAXSCORE, "");
+    } else {
+      scoreSheet.addSection(testName, score, MAXSCORE, "Incorrect return value.");
+    }
+  }
 
-		// Range negative increment
-		rangeNegativeTest(scoreSheet);
+  private static void countOutQueueTestWinner(ScoreSheet scoreSheet) {
+    String testName = "CountOut with Queue, find winner";
+    int MAXSCORE = 5;
 
-		return scoreSheet;
-	}
+    int score = MAXSCORE;
 
-	private static void rangePositiveTest(ScoreSheet scoreSheet) {
-		String testName = "Range positive increment";
-		boolean failed = false;
-		try {
-			Integer[] list1 = new Integer[] { 1, 2, 3, 4 };
-			if (!checkIterationEqual(new Range(1, 5, 1), Arrays.asList(list1))) {
-				failed = true;
-			}
+    try {
+      // Homework example
+      if (CountOut.findWinner(10, 4) != 4)
+        score -= 2;
+      // k == N
+      if (CountOut.findWinner(4, 4) != 1)
+        score -= 2;
+      // k > N
+      if (CountOut.findWinner(1, 4) != 0)
+        score -= 2;
+      if (CountOut.findWinner(2, 4) != 0)
+        score -= 2;
+      if (CountOut.findWinner(2, 3) != 1)
+        score -= 2;
+      if (CountOut.findWinner(3, 4) != 1)
+        score -= 2;
+      // k == 1
+      if (CountOut.findWinner(10, 1) != 9)
+        score -= 2;
+    } catch (Exception e) {
+      scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
+    }
+    score = score < 0 ? 0 : score;
+    if (score == MAXSCORE) {
+      scoreSheet.addSection(testName, score, MAXSCORE, "");
+    } else {
+      scoreSheet.addSection(testName, score, MAXSCORE, "Incorrect return value.");
+    }
+  }
 
-			Integer[] list2 = new Integer[] { 1, 2, 3, 4 };
-			if (!checkIterationEqual(new Range(1, 5), Arrays.asList(list2))) {
-				failed = true;
-			}
+  private static void countOutQueueTestWinnerRec(ScoreSheet scoreSheet) {
+    String testName = "CountOut with Queue, find winner, recursive";
+    int MAXSCORE = 15;
+    int score = MAXSCORE;
 
-			Integer[] list3 = new Integer[] { -3, 0, 3 };
-			if (!checkIterationEqual(new Range(-3, 6, 3), Arrays.asList(list3))) {
-				failed = true;
-			}
-			if (!failed) {
-				scoreSheet.addSection(testName, 15, 15, "");
-			} else {
-				scoreSheet.addSection(testName, 0, 15, "Incorrect output");
-			}
-		} catch (Exception e) {
-			scoreSheet.addSection(testName, 0, 15, stackTraceToString(e));
-		}
-	}
+    StringBuilder message = new StringBuilder();
+    message.append("Incorrect return value. ");
+    try {
+      // Homework example
+      if (CountOut.findWinnerRec(10, 4) != 4) {
+        score -= 5;
+      }
+      // k == N
+      if (CountOut.findWinnerRec(4, 4) != 1) {
+        score -= 5;
+      }
+      // k > N
+      if (CountOut.findWinnerRec(1, 4) != 0) {
+        score -= 5;
+      }
+      if (CountOut.findWinnerRec(2, 4) != 0) {
+        score -= 5;
+      }
+      if (CountOut.findWinnerRec(2, 3) != 1) {
+        score -= 5;
+      }
+      if (CountOut.findWinnerRec(3, 4) != 1) {
+        score -= 5;
+      }
+      // k == 1 // I bet a lot of them get this wrong
+      if (CountOut.findWinnerRec(10, 1) != 9) {
+        score -= 5;
+        message.append("what happens with k=1?\n");
+      }
+      ;
+    } catch (Exception e) {
+      scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
+    }
+    score = score < 0 ? 0 : score;
+    if (score == MAXSCORE) {
+      scoreSheet.addSection(testName, score, MAXSCORE, "");
+    } else {
+      scoreSheet.addSection(testName, score, MAXSCORE, message.toString().trim());
+    }
+  }
 
-	private static void rangeNegativeTest(ScoreSheet scoreSheet) {
-		String testName = "Range negative increment";
-		boolean failed = false;
-		try {
-			Integer[] list1 = new Integer[] { 5, 4, 3, 2 };
-			if (!checkIterationEqual(new Range(5, 1, -1), Arrays.asList(list1))) {
-				failed = true;
-			}
+  private static void bufferTest(ScoreSheet scoreSheet) throws IOException {
+    String testName = "FastBuffer test";
+    int MAXSCORE = 26;
+    int score = MAXSCORE;
 
-			Integer[] list2 = new Integer[] { 6, 3, 0 };
-			if (!checkIterationEqual(new Range(6, -3, -3), Arrays.asList(list2))) {
-				failed = true;
-			}
+    StringBuilder message = new StringBuilder();
 
-			if (!failed) {
-				scoreSheet.addSection(testName, 15, 15, "");
-			} else {
-				scoreSheet.addSection(testName, 0, 15, "Incorrect output");
-			}
-		} catch (Exception e) {
-			scoreSheet.addSection(testName, 0, 15, stackTraceToString(e));
-		}
-	}
+    StringBuilder testStringBuilder = new StringBuilder();
+    BufferedReader testReader = new BufferedReader(new InputStreamReader(new FileInputStream("loremipsum.txt")));
+    String chars;
+    while ((chars = testReader.readLine()) != null) {
+      testStringBuilder.append(chars);
+    }
+    String testString = testStringBuilder.toString();
 
-	private static boolean checkIterationEqual(Iterable<Integer> student,
-			Iterable<Integer> gold) {
-		Iterator<Integer> studentIterator = student.iterator();
-		Iterator<Integer> goldIterator = gold.iterator();
-		while (goldIterator.hasNext()) {
-			if (studentIterator.next() != goldIterator.next()) {
-				return false;
-			}
-		}
-		return true;
-	}
+    try {
+      Buffer studentBuffer = new FastBuffer();
 
-	private static void indexOfTest(ScoreSheet scoreSheet) {
-		String testName = "SimpleLinkedList indexOf()";
-		try {
-			SimpleLinkedList<Integer> studentList = new SimpleLinkedList<Integer>();
-			LinkedList<Integer> javaList = new LinkedList<Integer>();
+      // Try inserting chars
+      for (char c : testString.toCharArray()) {
+        studentBuffer.insertLeft(c);
+      }
 
-			int size = 100;
-			for (int i = 0; i < size; i++) {
-				int element = (int) (size * Math.random());
-				studentList.add(element);
-				javaList.add(element);
-			}
+      // Size okay?
+      if (studentBuffer.size() != testString.length()) {
+        score -= 6;
+        message.append("Incorrect size.");
+      }
 
-			int testSize = 10;
+      // Set cursor
+      studentBuffer.setCursor(10);
 
-			boolean failed = false;
+      // Move right
+      studentBuffer.moveRight(); // -> 11
+      studentBuffer.moveRight(); // -> 12
+      studentBuffer.moveLeft(); // -> 11
 
-			for (int i = 0; i < testSize; i++) {
-				int element = (int) (size * Math.random());
-				if (studentList.indexOf(element) != javaList.indexOf(element)) {
-					failed = true;
-				}
-			}
-			if (!failed) {
-				scoreSheet.addSection(testName, 14, 14, "");
-			} else {
-				scoreSheet.addSection(testName, 0, 14, "Incorrect output");
-			}
-		} catch (Exception e) {
-			scoreSheet.addSection(testName, 0, 14, stackTraceToString(e));
-		}
-	}
+      // Check characters correct
+      boolean movesOkay = true;
+      if (studentBuffer.deleteRight() != testString.charAt(11)) {
+        score -= 5;
+        movesOkay = false;
+      }
+      if (studentBuffer.deleteLeft() != testString.charAt(10)) {
+        score -= 5;
+        movesOkay = false;
+      }
+      if (studentBuffer.deleteLeft() != testString.charAt(9)) {
+        score -= 5;
+        movesOkay = false;
+      }
+      if (!movesOkay)
+        message.append("Cursor moves and/or deletes don't work. ");
 
-	private static void reverseTest(ScoreSheet scoreSheet) {
-		String testName = "SimpleLinkedList reverse()";
-		try {
-			SimpleLinkedList<Integer> studentList = new SimpleLinkedList<Integer>();
-			LinkedList<Integer> javaList = new LinkedList<Integer>();
+      // Size okay?
+      if (studentBuffer.size() != testString.length() - 3) {
+        score -= 5;
+        message.append("Size incorrect after deletes.");
+      }
 
-			int size = 100;
-			for (int i = 0; i < size; i++) {
-				int element = (int) (size * Math.random());
-				studentList.add(element);
-				javaList.add(element);
-			}
+      // Test toArray
+      studentBuffer = new FastBuffer();
+      for (char c : testString.toCharArray()) {
+        studentBuffer.insertLeft(c);
+      }
+      // moves should not affect toArray
+      studentBuffer.setCursor(5);
+      studentBuffer.moveRight();
+      studentBuffer.moveRight();
+      studentBuffer.moveRight();
 
-			Collections.reverse(javaList);
-			studentList.reverse();
+      StringBuilder studentArrayStringBuilder = new StringBuilder();
+      for (char c : studentBuffer.toArray()) {
+        studentArrayStringBuilder.append(c);
+      }
+      if (!studentArrayStringBuilder.toString().equals(testString)) {
+        score -= 5;
+        message.append("toArray() return value incorrect. ");
+        System.out.println(studentArrayStringBuilder.toString());
+        System.out.println(testString);
+      }
 
-			boolean failed = false;
+      if (score == MAXSCORE) {
+        scoreSheet.addSection(testName, score, MAXSCORE, "");
+      } else {
+        scoreSheet.addSection(testName, score, MAXSCORE, message.toString());
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
+    }
+    testReader.close();
+  }
 
-			Iterator<Integer> iteJavaList = javaList.iterator();
-			Iterator<Integer> iteStudentList = studentList.iterator();
+  /** Return true if the two iterables are identical. */
+  private static <T> boolean compareCollections(Collection<T> l1, Collection<T> l2) {
+    if (l1.size() != l2.size()) {
+      return false;
+    }
+    T i2;
+    Iterator<T> l2iter = l2.iterator();
+    for (T i1 : l1) {
+      i2 = l2iter.next();
+      if (!(i2.equals(i1))) {
+        return false;
+      }
+    }
+    return true;
+  }
 
-			while (iteJavaList.hasNext()) {
-				if (iteJavaList.next() != iteStudentList.next()) {
-					failed = true;
-				}
-			}
-
-			if (!failed) {
-				scoreSheet.addSection(testName, 16, 16, "");
-			} else {
-				scoreSheet.addSection(testName, 0, 16, "Incorrect output");
-			}
-		} catch (Exception e) {
-			scoreSheet.addSection(testName, 0, 16, stackTraceToString(e));
-		}
-	}
-
-	private static void removeDuplicatesTest(ScoreSheet scoreSheet) {
-		String testName = "SimpleLinkedList removeDuplicates()";
-		try {
-			SimpleLinkedList<Integer> studentList = new SimpleLinkedList<Integer>();
-			LinkedList<Integer> javaList = new LinkedList<Integer>();
-
-			int size = 100;
-			int modFactor = 20;
-
-			for (int i = 0; i < size; i++) {
-				int element = ((int) (size * Math.random())) % modFactor;
-				studentList.add(element);
-				javaList.add(element);
-			}
-
-			LinkedHashSet<Integer> linkedHashSet = new LinkedHashSet<Integer>(
-					javaList);
-			javaList.clear();
-			javaList.addAll(linkedHashSet);
-			studentList.removeDuplicates();
-
-			boolean failed = false;
-
-			Iterator<Integer> iteJavaList = javaList.iterator();
-			Iterator<Integer> iteStudentList = studentList.iterator();
-
-			while (iteJavaList.hasNext()) {
-				if (iteJavaList.next() != iteStudentList.next()) {
-					failed = true;
-				}
-			}
-
-			if (!failed) {
-				scoreSheet.addSection(testName, 20, 20, "");
-			} else {
-				scoreSheet.addSection(testName, 0, 20, "Incorrect output");
-			}
-		} catch (Exception e) {
-			scoreSheet.addSection(testName, 0, 20, stackTraceToString(e));
-		}
-	}
-
-	private static void interleaveTest(ScoreSheet scoreSheet) {
-		String testName = "SimpleLinkedList interleave()";
-		try {
-			SimpleLinkedList<Integer> studentList1 = new SimpleLinkedList<Integer>();
-			SimpleLinkedList<Integer> studentList2 = new SimpleLinkedList<Integer>();
-
-			for (int i = 1; i <= 3; i++) {
-				studentList1.add(i);
-			}
-
-			for (int i = 10; i >= 6; i--) {
-				studentList2.add(i);
-			}
-
-			List<Integer> targetList1 = java.util.Arrays.asList(1, 10, 2, 9, 3, 8, 7,
-					6);
-			List<Integer> targetList2 = java.util.Arrays.asList(10, 1, 9, 2, 8, 3, 7,
-					6);
-
-			boolean failed = false;
-
-			studentList1.interleave(studentList2);
-			Iterator<Integer> studentListIter = studentList1.iterator();
-			for (Integer i : targetList1) {
-				if (i != studentListIter.next()) {
-					failed = true;
-				}
-			}
-
-			studentList1 = new SimpleLinkedList<Integer>();
-			for (int i = 1; i <= 3; i++) {
-				studentList1.add(i);
-			}
-
-			studentList2.interleave(studentList1);
-			studentListIter = studentList2.iterator();
-			for (Integer i : targetList2) {
-				if (i != studentListIter.next()) {
-					failed = true;
-				}
-			}
-
-			if (!failed) {
-				scoreSheet.addSection(testName, 20, 20, "");
-			} else {
-				scoreSheet.addSection(testName, 0, 20, "Incorrect output");
-			}
-		} catch (Exception e) {
-			scoreSheet.addSection(testName, 0, 20, stackTraceToString(e));
-		}
-	}
 }
