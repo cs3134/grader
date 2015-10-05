@@ -176,6 +176,7 @@ public class Tests {
         score -= 2;
     } catch (Exception e) {
       scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
+      return;
     }
     score = score < 0 ? 0 : score;
     if (score == MAXSCORE) {
@@ -186,7 +187,7 @@ public class Tests {
   }
 
   private static void countOutQueueTestWinnerRec(ScoreSheet scoreSheet) {
-    String testName = "CountOut with Queue, find winner, recursive";
+    String testName = "CountOut recursive , find winner";
     int MAXSCORE = 15;
     int score = MAXSCORE;
 
@@ -222,6 +223,7 @@ public class Tests {
       ;
     } catch (Exception e) {
       scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
+      return;
     }
     score = score < 0 ? 0 : score;
     if (score == MAXSCORE) {
@@ -313,15 +315,10 @@ public class Tests {
         System.out.println(testString);
       }
 
-      // if score ends up being negative, just give 0
-      if (score < 0) {
-        score = 0;
-      }
-
       if (score == MAXSCORE) {
         scoreSheet.addSection(testName, score, MAXSCORE, "");
       } else {
-        scoreSheet.addSection(testName, score, MAXSCORE, message.toString());
+        scoreSheet.addSection(testName, score, MAXSCORE, message.toString().trim());
       }
     } catch (Exception e) {
       scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
