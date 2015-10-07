@@ -49,17 +49,17 @@ public class Tests {
       scoreSheet.errorMessage = "Timed out";
       postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
-      System.exit(124);
+      System.exit(0);
     } catch (ExecutionException e) {
       scoreSheet.errorMessage = "Timed out";
       postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
-      System.exit(124);
+      System.exit(0);
     } catch (TimeoutException e) {
       scoreSheet.errorMessage = "Timed out";
       postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
-      System.exit(124);
+      System.exit(0);
     }
 
     if (!executor.isTerminated()) {
