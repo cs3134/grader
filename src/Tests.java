@@ -70,7 +70,7 @@ public class Tests {
     return scoreSheet;
   }
 
-  private static void postJson(ScoreSheet scoreSheet) {
+  private static void postJson(ScoreSheet scoreSheet) throws IOException {
     System.out.println(scoreSheet.toJSONString());
 
     String postUrl = "http://jarvis.xyz/webhook/curl";
