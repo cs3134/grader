@@ -47,22 +47,30 @@ public class Tests {
       future.get(timeLimitSeconds, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       scoreSheet.errorMessage = "Timed out";
-      System.out.println(scoreSheet.toJSONString());
-      System.exit(1);
+      postJson(scoreSheet);
+      System.exit(0);
     } catch (ExecutionException e) {
       scoreSheet.errorMessage = "Timed out";
+      postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
-      System.exit(1);
+      System.exit(0);
     } catch (TimeoutException e) {
       scoreSheet.errorMessage = "Timed out";
+      postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
-      System.exit(1);
+      System.exit(0);
     }
 
     if (!executor.isTerminated()) {
       executor.shutdownNow();
     }
 
+    postJson(scoreSheet);
+
+    return scoreSheet;
+  }
+
+  private static void postJson(ScoreSheet scoreSheet) {
     System.out.println(scoreSheet.toJSONString());
 
     String postUrl = "http://jarvis.xyz/webhook/curl";
@@ -72,8 +80,6 @@ public class Tests {
     post.setHeader("Content-type", "application/json");
     HttpClient httpClient = HttpClientBuilder.create().build();
     httpClient.execute(post);
-
-    return scoreSheet;
   }
 
   private static String stackTraceToString(Exception e) {
