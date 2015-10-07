@@ -47,17 +47,17 @@ public class Tests {
       future.get(timeLimitSeconds, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
       scoreSheet.errorMessage = "Timed out";
-      // postJson(scoreSheet);
+      postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
       System.exit(124);
     } catch (ExecutionException e) {
       scoreSheet.errorMessage = "Timed out";
-      // postJson(scoreSheet);
+      postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
       System.exit(124);
     } catch (TimeoutException e) {
       scoreSheet.errorMessage = "Timed out";
-      // postJson(scoreSheet);
+      postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
       System.exit(124);
     }
@@ -147,6 +147,7 @@ public class Tests {
         score -= 3;
     } catch (Exception e) {
       scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
+      return;
     }
     score = score < 0 ? 0 : score;
     if (score == MAXSCORE) {
@@ -329,6 +330,7 @@ public class Tests {
       }
     } catch (Exception e) {
       scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
+      return;
     }
     testReader.close();
   }
