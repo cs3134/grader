@@ -324,7 +324,7 @@ public class Tests {
       if (score == MAXSCORE) {
         scoreSheet.addSection(testName, score, MAXSCORE, "");
       } else {
-        scoreSheet.addSection(testName, score, MAXSCORE < 0 ? 0 : MAXSCORE, message.toString().trim());
+        scoreSheet.addSection(testName, score < 0 ? 0 : score, MAXSCORE, message.toString().trim());
       }
     } catch (Exception e) {
       scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
