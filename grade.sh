@@ -12,4 +12,6 @@
 #   curl -H "Content-Type: application/json" -X POST -d "{\"reponame\": \"$CIRCLE_PROJECT_REPONAME\", \"errorMessage\": \"Build failed to compile. Do you have all classes and methods present? You should have dummy methods (returning null or dummy primitives) for methods you have yet to implement.\"}" http://jarvis.xyz/webhook/curl
 # fi
 
+echo "HW2 deadline over"
+
 exit
