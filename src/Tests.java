@@ -127,7 +127,7 @@ public class Tests {
    */
   private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
 
-    // testBST(scoreSheet);
+    testBST(scoreSheet);
     testTrie(scoreSheet);
 
     return scoreSheet;
@@ -253,23 +253,25 @@ public class Tests {
 
     // iterator (test 1)
 
-    sectionString = "iterator(): returns inorder traversal of bst";
+    sectionString = "iterator(): returns postorder traversal of bst";
     maxScore = 11;
 
-    expected = new LinkedList<Integer>();
-    for (int i = 2; i < 9; i++) {
-      expected.add(i);
+    List<Integer> actual = new LinkedList<>();
+    for (int i : bst) {
+      actual.add(i);
     }
-    List<Integer> actual = new LinkedList<Integer>();
-    for (Integer data : bst) {
-      actual.add(data);
+
+    expected = new LinkedList<>();
+    int[] expectedArray = { 2, 4, 3, 6, 8, 7, 5 };
+    for (int i : expectedArray) {
+      expected.add(i);
     }
 
     try {
       if (actual.equals(expected)) {
         scoreSheet.addSection(sectionString, maxScore, maxScore, "");
       } else {
-        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect inorder traversal");
+        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect postorder traversal");
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
