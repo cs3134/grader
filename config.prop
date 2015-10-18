@@ -1,4 +1,8 @@
 className:cs3134
 homeworkName:hw3
+<<<<<<< HEAD
 studentMax:100
+=======
+studentMax:70
+>>>>>>> fb8d85963bd09ad47f6137f9daf4cc712e1afcdb
 timeLimitSeconds:10
