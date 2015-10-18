@@ -214,7 +214,7 @@ public class Tests {
     sectionString = "getInterval(): bst contains some elements in interval";
     maxScore = 4;
 
-    expected = new LinkedList<Integer>();
+    expected = new HashSet<Integer>();
     for (int i = 4; i < 7; i++) {
       expected.add(i);
     }
