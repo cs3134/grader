@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -127,7 +127,7 @@ public class Tests {
    */
   private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
 
-    testBST(scoreSheet);
+    // testBST(scoreSheet);
     testTrie(scoreSheet);
 
     return scoreSheet;
@@ -214,13 +214,14 @@ public class Tests {
     sectionString = "getInterval(): bst contains some elements in interval";
     maxScore = 4;
 
-    expected = new HashSet<Integer>();
+    HashSet<Integer> expectedSet = new HashSet<>();
     for (int i = 4; i < 7; i++) {
-      expected.add(i);
+      expectedSet.add(i);
     }
 
     try {
-      if (bst.getInterval(4, 6).equals(expected)) {
+      HashSet<Integer> studentSet = new HashSet<>(bst.getInterval(4, 6));
+      if (studentSet.equals(expectedSet)) {
         scoreSheet.addSection(sectionString, maxScore, maxScore, "");
       } else {
         scoreSheet.addSection(sectionString, 0, maxScore, "incorrect interval");
@@ -234,13 +235,14 @@ public class Tests {
     sectionString = "getInterval(): bst contains all elements in interval";
     maxScore = 4;
 
-    expected = new LinkedList<Integer>();
+    expectedSet = new HashSet<Integer>();
     for (int i = 2; i < 4; i++) {
-      expected.add(i);
+      expectedSet.add(i);
     }
 
     try {
-      if (bst.getInterval(0, 3).equals(expected)) {
+      HashSet<Integer> studentSet = new HashSet<>(bst.getInterval(0, 3));
+      if (studentSet.equals(expectedSet)) {
         scoreSheet.addSection(sectionString, maxScore, maxScore, "");
       } else {
         scoreSheet.addSection(sectionString, 0, maxScore, "incorrect interval");
