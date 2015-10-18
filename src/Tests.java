@@ -1,9 +1,12 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -100,242 +103,6 @@ public class Tests {
     return sb.toString().trim();
   }
 
-  /**
-   * Graders, you should only edit this. No more.
-   *
-   * @param scoreSheet
-   * @return
-   */
-  private static ScoreSheet tests(ScoreSheet scoreSheet) {
-
-    countOutQueueTestList(scoreSheet);
-    countOutQueueTestWinner(scoreSheet);
-    countOutQueueTestWinnerRec(scoreSheet);
-    try {
-      bufferTest(scoreSheet);
-    } catch (IOException e) {
-      System.out.println(stackTraceToString(e));
-      System.err.println("Skipping buffer test.");
-    }
-    return scoreSheet;
-  }
-
-  private static void countOutQueueTestList(ScoreSheet scoreSheet) {
-    String testName = "CountOut with Queue, list of players";
-    int MAXSCORE = 6;
-
-    int score = MAXSCORE;
-
-    try {
-      // Homework example
-      if (!(compareCollections(Arrays.asList(3, 7, 1, 6, 2, 9, 8, 0, 5, 4), CountOut.play(10, 4))))
-        score -= 3;
-      // k == N
-      if (!(compareCollections(Arrays.asList(3, 0, 2, 1), CountOut.play(4, 4))))
-        score -= 3;
-      // k > N
-      if (!(compareCollections(Arrays.asList(0), CountOut.play(1, 4))))
-        score -= 3;
-      if (!(compareCollections(Arrays.asList(1, 0), CountOut.play(2, 4))))
-        score -= 3;
-      if (!(compareCollections(Arrays.asList(0, 1), CountOut.play(2, 3))))
-        score -= 3;
-      if (!(compareCollections(Arrays.asList(0, 2, 1), CountOut.play(3, 4))))
-        score -= 3;
-      // k == 1
-      if (!(compareCollections(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), CountOut.play(10, 1))))
-        score -= 3;
-    } catch (Exception e) {
-      scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
-      return;
-    }
-    score = score < 0 ? 0 : score;
-    if (score == MAXSCORE) {
-      scoreSheet.addSection(testName, score, MAXSCORE, "");
-    } else {
-      scoreSheet.addSection(testName, score, MAXSCORE, "Incorrect return value.");
-    }
-  }
-
-  private static void countOutQueueTestWinner(ScoreSheet scoreSheet) {
-    String testName = "CountOut with Queue, find winner";
-    int MAXSCORE = 5;
-
-    int score = MAXSCORE;
-
-    try {
-      // Homework example
-      if (CountOut.findWinner(10, 4) != 4)
-        score -= 2;
-      // k == N
-      if (CountOut.findWinner(4, 4) != 1)
-        score -= 2;
-      // k > N
-      if (CountOut.findWinner(1, 4) != 0)
-        score -= 2;
-      if (CountOut.findWinner(2, 4) != 0)
-        score -= 2;
-      if (CountOut.findWinner(2, 3) != 1)
-        score -= 2;
-      if (CountOut.findWinner(3, 4) != 1)
-        score -= 2;
-      // k == 1
-      if (CountOut.findWinner(10, 1) != 9)
-        score -= 2;
-    } catch (Exception e) {
-      scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
-      return;
-    }
-    score = score < 0 ? 0 : score;
-    if (score == MAXSCORE) {
-      scoreSheet.addSection(testName, score, MAXSCORE, "");
-    } else {
-      scoreSheet.addSection(testName, score, MAXSCORE, "Incorrect return value.");
-    }
-  }
-
-  private static void countOutQueueTestWinnerRec(ScoreSheet scoreSheet) {
-    String testName = "CountOut recursive , find winner";
-    int MAXSCORE = 15;
-    int score = MAXSCORE;
-
-    StringBuilder message = new StringBuilder();
-    message.append("Incorrect return value. ");
-    try {
-      // Homework example
-      if (CountOut.findWinnerRec(10, 4) != 4) {
-        score -= 5;
-      }
-      // k == N
-      if (CountOut.findWinnerRec(4, 4) != 1) {
-        score -= 5;
-      }
-      // k > N
-      if (CountOut.findWinnerRec(1, 4) != 0) {
-        score -= 5;
-      }
-      if (CountOut.findWinnerRec(2, 4) != 0) {
-        score -= 5;
-      }
-      if (CountOut.findWinnerRec(2, 3) != 1) {
-        score -= 5;
-      }
-      if (CountOut.findWinnerRec(3, 4) != 1) {
-        score -= 5;
-      }
-      // k == 1 // I bet a lot of them get this wrong
-      if (CountOut.findWinnerRec(10, 1) != 9) {
-        score -= 5;
-        message.append("what happens with k=1?\n");
-      }
-      ;
-    } catch (Exception e) {
-      scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
-      return;
-    }
-    score = score < 0 ? 0 : score;
-    if (score == MAXSCORE) {
-      scoreSheet.addSection(testName, score, MAXSCORE, "");
-    } else {
-      scoreSheet.addSection(testName, score, MAXSCORE, message.toString().trim());
-    }
-  }
-
-  private static void bufferTest(ScoreSheet scoreSheet) throws IOException {
-    String testName = "FastBuffer test";
-    int MAXSCORE = 26;
-    int score = MAXSCORE;
-
-    StringBuilder message = new StringBuilder();
-
-    StringBuilder testStringBuilder = new StringBuilder();
-    BufferedReader testReader = new BufferedReader(new InputStreamReader(new FileInputStream("loremipsum.txt")));
-    String chars;
-    while ((chars = testReader.readLine()) != null) {
-      testStringBuilder.append(chars);
-    }
-    String testString = testStringBuilder.toString();
-
-    try {
-      Buffer studentBuffer = new FastBuffer();
-
-      // Try inserting chars
-      for (char c : testString.toCharArray()) {
-        studentBuffer.insertLeft(c);
-      }
-
-      // Size okay?
-      if (studentBuffer.size() != testString.length()) {
-        score -= 6;
-        message.append("Incorrect size.");
-      }
-
-      // Set cursor
-      studentBuffer.setCursor(10);
-
-      // Move right
-      studentBuffer.moveRight(); // -> 11
-      studentBuffer.moveRight(); // -> 12
-      studentBuffer.moveLeft(); // -> 11
-
-      // Check characters correct
-      boolean movesOkay = true;
-      if (studentBuffer.deleteRight() != testString.charAt(11)) {
-        score -= 5;
-        movesOkay = false;
-      }
-      if (studentBuffer.deleteLeft() != testString.charAt(10)) {
-        score -= 5;
-        movesOkay = false;
-      }
-      if (studentBuffer.deleteLeft() != testString.charAt(9)) {
-        score -= 5;
-        movesOkay = false;
-      }
-      if (!movesOkay)
-        message.append("Cursor moves and/or deletes don't work. ");
-
-      // Size okay?
-      if (studentBuffer.size() != testString.length() - 3) {
-        score -= 5;
-        message.append("Size incorrect after deletes.");
-      }
-
-      // Test toArray
-      studentBuffer = new FastBuffer();
-      for (char c : testString.toCharArray()) {
-        studentBuffer.insertLeft(c);
-      }
-      // moves should not affect toArray
-      studentBuffer.setCursor(5);
-      studentBuffer.moveRight();
-      studentBuffer.moveRight();
-      studentBuffer.moveRight();
-
-      StringBuilder studentArrayStringBuilder = new StringBuilder();
-      for (char c : studentBuffer.toArray()) {
-        studentArrayStringBuilder.append(c);
-      }
-      if (!studentArrayStringBuilder.toString().equals(testString)) {
-        score -= 5;
-        message.append("toArray() return value incorrect. ");
-        System.out.println(studentArrayStringBuilder.toString());
-        System.out.println(testString);
-      }
-
-      if (score == MAXSCORE) {
-        scoreSheet.addSection(testName, score, MAXSCORE, "");
-      } else {
-        scoreSheet.addSection(testName, score < 0 ? 0 : score, MAXSCORE, message.toString().trim());
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(testName, 0, MAXSCORE, stackTraceToString(e));
-      return;
-    }
-    testReader.close();
-  }
-
-  /** Return true if the two iterables are identical. */
   private static <T> boolean compareCollections(Collection<T> l1, Collection<T> l2) {
     if (l1.size() != l2.size()) {
       return false;
@@ -351,4 +118,285 @@ public class Tests {
     return true;
   }
 
+  /**
+   * Graders, you should only edit this. No more.
+   *
+   * @param scoreSheet
+   * @return
+   * @throws IOException
+   */
+  private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
+
+    testBST(scoreSheet);
+    testTrie(scoreSheet);
+
+    return scoreSheet;
+  }
+
+  private static void testBST(ScoreSheet scoreSheet) {
+    String sectionString;
+    int maxScore;
+
+    BinarySearchTree<Integer> bst = new BinarySearchTree<Integer>();
+
+    // isBst (test 1)
+
+    sectionString = "isBst(): returns true on an empty BST";
+    maxScore = 3;
+
+    try {
+      if (bst.isBst()) {
+        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
+      } else {
+        scoreSheet.addSection(sectionString, 0, maxScore, "returns false on an empty BST");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
+    }
+
+    // isBst (test 2)
+
+    sectionString = "isBst(): returns true on a BST built by inserting values";
+    maxScore = 4;
+
+    int[] vals = { 5, 3, 7, 2, 4, 6, 8 };
+    for (Integer val : vals) {
+      bst.insert(val);
+    }
+
+    try {
+      if (bst.isBst()) {
+        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
+      } else {
+        scoreSheet.addSection(sectionString, 0, maxScore, "returns false on a valid BST");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
+    }
+
+    // isBst (test 3)
+    // TODO (can't build invalid BST with private BinaryNode class)
+
+    sectionString = "isBst(): returns false on an invalid BST built with the constructor";
+    maxScore = 4;
+
+    BinarySearchTree<Integer> nonBst = new BinarySearchTree<Integer>();
+
+    try {
+      if (true) {
+        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
+      } else {
+        scoreSheet.addSection(sectionString, 0, maxScore, "returns true on an invalid BST");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
+    }
+
+    // getInterval (test 1)
+
+    sectionString = "getInterval(): bst contains no elements in interval";
+    maxScore = 3;
+
+    List<Integer> expected = new LinkedList<Integer>();
+
+    try {
+      if (bst.getInterval(10, 12).equals(expected)) {
+        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
+      } else {
+        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect interval");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
+    }
+
+    // getInterval (test 2)
+
+    sectionString = "getInterval(): bst contains some elements in interval";
+    maxScore = 4;
+
+    expected = new LinkedList<Integer>();
+    for (int i = 4; i < 7; i++) {
+      expected.add(i);
+    }
+
+    try {
+      if (bst.getInterval(4, 6).equals(expected)) {
+        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
+      } else {
+        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect interval");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
+    }
+
+    // getInterval (test 3)
+
+    sectionString = "getInterval(): bst contains all elements in interval";
+    maxScore = 4;
+
+    expected = new LinkedList<Integer>();
+    for (int i = 2; i < 4; i++) {
+      expected.add(i);
+    }
+
+    try {
+      if (bst.getInterval(0, 3).equals(expected)) {
+        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
+      } else {
+        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect interval");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
+    }
+
+    // iterator (test 1)
+
+    sectionString = "iterator(): returns inorder traversal of bst";
+    maxScore = 11;
+
+    expected = new LinkedList<Integer>();
+    for (int i = 2; i < 9; i++) {
+      expected.add(i);
+    }
+    List<Integer> actual = new LinkedList<Integer>();
+    for (Integer data : bst) {
+      actual.add(data);
+    }
+
+    try {
+      if (actual.equals(expected)) {
+        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
+      } else {
+        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect inorder traversal");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
+    }
+  }
+
+  private static void testTrie(ScoreSheet scoreSheet) throws IOException {
+    BufferedReader bufferedReader = new BufferedReader(new FileReader("dictionary.txt"));
+    String line;
+
+    HashSet<String> dictionary = new HashSet<>();
+    while ((line = bufferedReader.readLine()) != null) {
+      dictionary.add(line);
+    }
+
+    bufferedReader.close();
+
+    Trie trie = new Trie();
+
+    // empty check contains returns correctly
+    try {
+      if (!trie.contains("pikachu")) {
+        scoreSheet.addSection("contains(): empty trie returns false", 2, 2, "");
+      } else {
+        scoreSheet.addSection("contains(): empty trie returns false", 0, 2, "Empty trie returned true for a word");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection("contains(): empty trie returns false", 0, 2, stackTraceToString(e));
+    }
+
+    // empty return list size 0
+    try {
+      if (trie.getStrings().size() == 0) {
+        scoreSheet.addSection("getStrings(): empty trie returns list of size 0", 2, 2, "");
+      } else {
+        scoreSheet.addSection("getStrings(): empty trie returns list of size 0", 0, 2,
+            "Empty trie did not return list of size 0");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection("getStrings(): empty trie returns list of size 0", 0, 2, stackTraceToString(e));
+    }
+
+    // empty returns list size 0
+    try {
+      if (trie.getStartsWith("rat").size() == 0) {
+        scoreSheet.addSection("getStartsWith(): empty trie returns list of size 0", 2, 2, "");
+      } else {
+        scoreSheet.addSection("getStartsWith(): empty trie returns list of size 0", 0, 2,
+            "Empty trie did not return list of size 0");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection("getStartrsWith(): empty trie returns list of size 0", 0, 2, stackTraceToString(e));
+    }
+
+    // add words
+    try {
+      for (String word : dictionary) {
+        trie.addWord(word);
+      }
+      scoreSheet.addSection("addWords(): added many words", 11, 11, "");
+    } catch (Exception e) {
+      scoreSheet.addSection("addWords(): added many words", 0, 11, stackTraceToString(e));
+    }
+
+    // contains rattata
+    try {
+      if (trie.contains("rattata")) {
+        scoreSheet.addSection("contains(): returns true for added word", 5, 5, "");
+      } else {
+        scoreSheet.addSection("contains(): returns true for added word", 0, 5, "Did not return true");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection("contains(): returns true for added word", 0, 5, stackTraceToString(e));
+    }
+
+    // does not contains rat
+    try {
+      if (!trie.contains("rat")) {
+        scoreSheet.addSection("contains(): returns false for non-added word", 4, 4, "");
+      } else {
+        scoreSheet.addSection("contains(): returns false for non-added word", 0, 4, "Did not return false");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection("contains(): returns false for non-added word", 0, 4, stackTraceToString(e));
+    }
+
+    // get back list of added words
+    try {
+      HashSet<String> trieDictionary = new HashSet<String>(trie.getStrings());
+
+      if (dictionary.equals(trieDictionary)) {
+        scoreSheet.addSection("getStrings(): returns all added words", 9, 9, "");
+      } else {
+        scoreSheet.addSection("getStrings(): returns all added words", 0, 9, "Did not return all words correctly");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection("getStrings(): returns all added words", 0, 9, stackTraceToString(e));
+    }
+
+    // getStartsWith pid
+    try {
+      String[] pids = { "pidgey", "pidgeotto", "pidgeot", "pidove", "pidgeotmega" };
+      HashSet<String> pid = new HashSet<String>(Arrays.asList(pids));
+      HashSet<String> pidTrie = new HashSet<String>(trie.getStartsWith("pid"));
+      if (pid.equals(pidTrie)) {
+        scoreSheet.addSection("getStartsWith(): returns words starting with a certain prefix", 5, 5, "");
+      } else {
+        scoreSheet.addSection("getStartsWith(): returns words starting with a certain prefix", 0, 5,
+            "Did not return words correctly");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection("getStartsWith(): returns words starting with a certain prefix", 0, 5,
+          stackTraceToString(e));
+    }
+
+    // getStartsWith mew. notice that mew itself is a word
+    try {
+      String[] mews = { "mew", "mewtwo", "mewtwomegax", "mewtwomegay" };
+      HashSet<String> mew = new HashSet<String>(Arrays.asList(mews));
+      HashSet<String> mewTrie = new HashSet<String>(trie.getStartsWith("mew"));
+      if (mew.equals(mewTrie)) {
+        scoreSheet.addSection("getStartsWith(): returns words starting with a prefix which is also a word", 4, 4, "");
+      } else {
+        scoreSheet.addSection("getStartsWith(): returns words starting with a prefix which is also a word", 0, 4,
+            "Did not return words correctly");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection("getStartsWith(): returns words starting with a prefix which is also a word", 0, 4,
+          stackTraceToString(e));
+    }
+  }
 }
