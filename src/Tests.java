@@ -49,17 +49,14 @@ public class Tests {
     try {
       future.get(timeLimitSeconds, TimeUnit.SECONDS);
     } catch (InterruptedException e) {
-      scoreSheet.errorMessage = "Timed out";
       postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
       System.exit(0);
     } catch (ExecutionException e) {
-      scoreSheet.errorMessage = "Timed out";
       postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
       System.exit(0);
     } catch (TimeoutException e) {
-      scoreSheet.errorMessage = "Timed out";
       postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
       System.exit(0);
