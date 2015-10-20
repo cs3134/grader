@@ -138,7 +138,7 @@ public class Tests {
 
     // isBst (test 1)
 
-    sectionString = "isBst(): returns true on an empty BST";
+    sectionString = "BinarySearchTree.isBst(): returns true on an empty BST";
     maxScore = 3;
 
     try {
@@ -153,7 +153,7 @@ public class Tests {
 
     // isBst (test 2)
 
-    sectionString = "isBst(): returns true on a BST built by inserting values";
+    sectionString = "BinarySearchTree.isBst(): returns true on a BST built by inserting values";
     maxScore = 4;
 
     int[] vals = { 5, 3, 7, 2, 4, 6, 8 };
@@ -174,7 +174,7 @@ public class Tests {
     // isBst (test 3)
     // TODO (can't build invalid BST with private BinaryNode class)
 
-    sectionString = "isBst(): returns false on an invalid BST built with the constructor";
+    sectionString = "BinarySearchTree.isBst(): returns false on an invalid BST built with the constructor";
     maxScore = 4;
 
     BinarySearchTree<Integer> nonBst = new BinarySearchTree<Integer>();
@@ -191,7 +191,7 @@ public class Tests {
 
     // getInterval (test 1)
 
-    sectionString = "getInterval(): bst contains no elements in interval";
+    sectionString = "BinarySearchTree.getInterval(): bst contains no elements in interval";
     maxScore = 3;
 
     List<Integer> expected = new LinkedList<Integer>();
@@ -208,7 +208,7 @@ public class Tests {
 
     // getInterval (test 2)
 
-    sectionString = "getInterval(): bst contains some elements in interval";
+    sectionString = "BinarySearchTree.getInterval(): bst contains some elements in interval";
     maxScore = 4;
 
     HashSet<Integer> expectedSet = new HashSet<>();
@@ -229,7 +229,7 @@ public class Tests {
 
     // getInterval (test 3)
 
-    sectionString = "getInterval(): bst contains all elements in interval";
+    sectionString = "BinarySearchTree.getInterval(): bst contains all elements in interval";
     maxScore = 4;
 
     expectedSet = new HashSet<Integer>();
@@ -250,7 +250,7 @@ public class Tests {
 
     // iterator (test 1)
 
-    sectionString = "iterator(): returns postorder traversal of bst";
+    sectionString = "BinarySearchTree.iterator(): returns postorder traversal of bst";
     maxScore = 11;
 
     List<Integer> actual = new LinkedList<>();
@@ -291,36 +291,36 @@ public class Tests {
     // empty check contains returns correctly
     try {
       if (!trie.contains("pikachu")) {
-        scoreSheet.addSection("contains(): empty trie returns false", 2, 2, "");
+        scoreSheet.addSection("Trie.contains(): empty trie returns false", 2, 2, "");
       } else {
-        scoreSheet.addSection("contains(): empty trie returns false", 0, 2, "Empty trie returned true for a word");
+        scoreSheet.addSection("Trie.contains(): empty trie returns false", 0, 2, "Empty trie returned true for a word");
       }
     } catch (Exception e) {
-      scoreSheet.addSection("contains(): empty trie returns false", 0, 2, stackTraceToString(e));
+      scoreSheet.addSection("Trie.contains(): empty trie returns false", 0, 2, stackTraceToString(e));
     }
 
     // empty return list size 0
     try {
       if (trie.getStrings().size() == 0) {
-        scoreSheet.addSection("getStrings(): empty trie returns list of size 0", 2, 2, "");
+        scoreSheet.addSection("Trie.getStrings(): empty trie returns list of size 0", 2, 2, "");
       } else {
-        scoreSheet.addSection("getStrings(): empty trie returns list of size 0", 0, 2,
+        scoreSheet.addSection("Trie.getStrings(): empty trie returns list of size 0", 0, 2,
             "Empty trie did not return list of size 0");
       }
     } catch (Exception e) {
-      scoreSheet.addSection("getStrings(): empty trie returns list of size 0", 0, 2, stackTraceToString(e));
+      scoreSheet.addSection("Trie.getStrings(): empty trie returns list of size 0", 0, 2, stackTraceToString(e));
     }
 
     // empty returns list size 0
     try {
       if (trie.getStartsWith("rat").size() == 0) {
-        scoreSheet.addSection("getStartsWith(): empty trie returns list of size 0", 2, 2, "");
+        scoreSheet.addSection("Trie.getStartsWith(): empty trie returns list of size 0", 2, 2, "");
       } else {
-        scoreSheet.addSection("getStartsWith(): empty trie returns list of size 0", 0, 2,
+        scoreSheet.addSection("Trie.getStartsWith(): empty trie returns list of size 0", 0, 2,
             "Empty trie did not return list of size 0");
       }
     } catch (Exception e) {
-      scoreSheet.addSection("getStartrsWith(): empty trie returns list of size 0", 0, 2, stackTraceToString(e));
+      scoreSheet.addSection("Trie.getStartsWith(): empty trie returns list of size 0", 0, 2, stackTraceToString(e));
     }
 
     // add words
@@ -336,23 +336,23 @@ public class Tests {
     // contains rattata
     try {
       if (trie.contains("rattata")) {
-        scoreSheet.addSection("contains(): returns true for added word", 5, 5, "");
+        scoreSheet.addSection("Trie.contains(): returns true for added word", 5, 5, "");
       } else {
-        scoreSheet.addSection("contains(): returns true for added word", 0, 5, "Did not return true");
+        scoreSheet.addSection("Trie.contains(): returns true for added word", 0, 5, "Did not return true");
       }
     } catch (Exception e) {
-      scoreSheet.addSection("contains(): returns true for added word", 0, 5, stackTraceToString(e));
+      scoreSheet.addSection("Trie.contains(): returns true for added word", 0, 5, stackTraceToString(e));
     }
 
     // does not contains rat
     try {
       if (!trie.contains("rat")) {
-        scoreSheet.addSection("contains(): returns false for non-added word", 4, 4, "");
+        scoreSheet.addSection("Trie.contains(): returns false for non-added word", 4, 4, "");
       } else {
-        scoreSheet.addSection("contains(): returns false for non-added word", 0, 4, "Did not return false");
+        scoreSheet.addSection("Trie.contains(): returns false for non-added word", 0, 4, "Did not return false");
       }
     } catch (Exception e) {
-      scoreSheet.addSection("contains(): returns false for non-added word", 0, 4, stackTraceToString(e));
+      scoreSheet.addSection("Trie.contains(): returns false for non-added word", 0, 4, stackTraceToString(e));
     }
 
     // get back list of added words
@@ -360,12 +360,12 @@ public class Tests {
       HashSet<String> trieDictionary = new HashSet<String>(trie.getStrings());
 
       if (dictionary.equals(trieDictionary)) {
-        scoreSheet.addSection("getStrings(): returns all added words", 9, 9, "");
+        scoreSheet.addSection("Trie.getStrings(): returns all added words", 9, 9, "");
       } else {
-        scoreSheet.addSection("getStrings(): returns all added words", 0, 9, "Did not return all words correctly");
+        scoreSheet.addSection("Trie.getStrings(): returns all added words", 0, 9, "Did not return all words correctly");
       }
     } catch (Exception e) {
-      scoreSheet.addSection("getStrings(): returns all added words", 0, 9, stackTraceToString(e));
+      scoreSheet.addSection("Trie.getStrings(): returns all added words", 0, 9, stackTraceToString(e));
     }
 
     // getStartsWith pid
@@ -374,13 +374,13 @@ public class Tests {
       HashSet<String> pid = new HashSet<String>(Arrays.asList(pids));
       HashSet<String> pidTrie = new HashSet<String>(trie.getStartsWith("pid"));
       if (pid.equals(pidTrie)) {
-        scoreSheet.addSection("getStartsWith(): returns words starting with a certain prefix", 5, 5, "");
+        scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a certain prefix", 5, 5, "");
       } else {
-        scoreSheet.addSection("getStartsWith(): returns words starting with a certain prefix", 0, 5,
+        scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a certain prefix", 0, 5,
             "Did not return words correctly");
       }
     } catch (Exception e) {
-      scoreSheet.addSection("getStartsWith(): returns words starting with a certain prefix", 0, 5,
+      scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a certain prefix", 0, 5,
           stackTraceToString(e));
     }
 
@@ -390,13 +390,13 @@ public class Tests {
       HashSet<String> mew = new HashSet<String>(Arrays.asList(mews));
       HashSet<String> mewTrie = new HashSet<String>(trie.getStartsWith("mew"));
       if (mew.equals(mewTrie)) {
-        scoreSheet.addSection("getStartsWith(): returns words starting with a prefix which is also a word", 4, 4, "");
+        scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a prefix which is also a word", 4, 4, "");
       } else {
-        scoreSheet.addSection("getStartsWith(): returns words starting with a prefix which is also a word", 0, 4,
+        scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a prefix which is also a word", 0, 4,
             "Did not return words correctly");
       }
     } catch (Exception e) {
-      scoreSheet.addSection("getStartsWith(): returns words starting with a prefix which is also a word", 0, 4,
+      scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a prefix which is also a word", 0, 4,
           stackTraceToString(e));
     }
   }
