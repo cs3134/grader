@@ -328,9 +328,9 @@ public class Tests {
       for (String word : dictionary) {
         trie.addWord(word);
       }
-      scoreSheet.addSection("addWords(): added many words", 11, 11, "");
+      scoreSheet.addSection("Trie.addWord(): added many words", 11, 11, "");
     } catch (Exception e) {
-      scoreSheet.addSection("addWords(): added many words", 0, 11, stackTraceToString(e));
+      scoreSheet.addSection("Trie.addWord(): added many words", 0, 11, stackTraceToString(e));
     }
 
     // contains rattata
