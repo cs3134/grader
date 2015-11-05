@@ -392,7 +392,7 @@ public class Tests {
     }
 
     sectionName = "BwogBot.getNMostPopularWords(): returns correct words";
-    sectionScoreMax = 7;
+    sectionScoreMax = 10;
     try {
       List<String> mostPopular = Arrays.asList(new String[] { "hodor", "the", "to", "a", "is" });
       List<String> botMostPopular = bot.getNMostPopularWords(5);
