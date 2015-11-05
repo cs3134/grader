@@ -1,12 +1,8 @@
-import java.io.BufferedReader;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Callable;
@@ -23,6 +19,83 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 public class Tests {
+
+  private static String[] pokemons = { "bulbasaur", "ivysaur", "venusaur", "charmander", "charmeleon", "charizard",
+      "squirtle", "wartortle", "blastoise", "caterpie", "metapod", "butterfree", "weedle", "kakuna", "beedrill",
+      "pidgey", "pidgeotto", "pidgeot", "rattata", "raticate", "spearow", "fearow", "ekans", "arbok", "pikachu",
+      "raichu", "sandshrew", "sandslash", "nidorina", "nidoqueen", "nidoran", "nidorino", "nidoking", "clefairy",
+      "clefable", "vulpix", "ninetales", "jigglypuff", "wigglytuff", "zubat", "golbat", "oddish", "gloom", "vileplume",
+      "paras", "parasect", "venonat", "venomoth", "diglett", "dugtrio", "meowth", "persian", "psyduck", "golduck",
+      "mankey", "primeape", "growlithe", "arcanine", "poliwag", "poliwhirl", "poliwrath", "abra", "kadabra", "alakazam",
+      "machop", "machoke", "machamp", "bellsprout", "weepinbell", "victreebel", "tentacool", "tentacruel", "geodude",
+      "graveler", "golem", "ponyta", "rapidash", "slowpoke", "slowbro", "magnemite", "magneton", "farfetch'd", "doduo",
+      "dodrio", "seel", "dewgong", "grimer", "muk", "shellder", "cloyster", "gastly", "haunter", "gengar", "onix",
+      "drowzee", "hypno", "krabby", "kingler", "voltorb", "electrode", "exeggcute", "exeggutor", "cubone", "marowak",
+      "hitmonlee", "hitmonchan", "lickitung", "koffing", "weezing", "rhyhorn", "rhydon", "chansey", "tangela",
+      "kangaskhan", "horsea", "seadra", "goldeen", "seaking", "staryu", "starmie", "mr. mime", "scyther", "jynx",
+      "electabuzz", "magmar", "pinsir", "tauros", "magikarp", "gyarados", "lapras", "ditto", "eevee", "vaporeon",
+      "jolteon", "flareon", "porygon", "omanyte", "omastar", "kabuto", "kabutops", "aerodactyl", "snorlax", "articuno",
+      "zapdos", "moltres", "dratini", "dragonair", "dragonite", "mewtwo", "mew", "chikorita", "bayleef", "meganium",
+      "cyndaquil", "quilava", "typhlosion", "totodile", "croconaw", "feraligatr", "sentret", "furret", "hoothoot",
+      "noctowl", "ledyba", "ledian", "spinarak", "ariados", "crobat", "chinchou", "lanturn", "pichu", "cleffa",
+      "igglybuff", "togepi", "togetic", "natu", "xatu", "mareep", "flaaffy", "ampharos", "bellossom", "marill",
+      "azumarill", "sudowoodo", "politoed", "hoppip", "skiploom", "jumpluff", "aipom", "sunkern", "sunflora", "yanma",
+      "wooper", "quagsire", "espeon", "umbreon", "murkrow", "slowking", "misdreavus", "unown", "wobbuffet", "girafarig",
+      "pineco", "forretress", "dunsparce", "gligar", "steelix", "snubbull", "granbull", "qwilfish", "scizor", "shuckle",
+      "heracross", "sneasel", "teddiursa", "ursaring", "slugma", "magcargo", "swinub", "piloswine", "corsola",
+      "remoraid", "octillery", "delibird", "mantine", "skarmory", "houndour", "houndoom", "kingdra", "phanpy",
+      "donphan", "porygon2", "stantler", "smeargle", "tyrogue", "hitmontop", "smoochum", "elekid", "magby", "miltank",
+      "blissey", "raikou", "entei", "suicune", "larvitar", "pupitar", "tyranitar", "lugia", "ho-oh", "celebi",
+      "treecko", "grovyle", "sceptile", "torchic", "combusken", "blaziken", "mudkip", "marshtomp", "swampert",
+      "poochyena", "mightyena", "zigzagoon", "linoone", "wurmple", "silcoon", "beautifly", "cascoon", "dustox", "lotad",
+      "lombre", "ludicolo", "seedot", "nuzleaf", "shiftry", "taillow", "swellow", "wingull", "pelipper", "ralts",
+      "kirlia", "gardevoir", "surskit", "masquerain", "shroomish", "breloom", "slakoth", "vigoroth", "slaking",
+      "nincada", "ninjask", "shedinja", "whismur", "loudred", "exploud", "makuhita", "hariyama", "azurill", "nosepass",
+      "skitty", "delcatty", "sableye", "mawile", "aron", "lairon", "aggron", "meditite", "medicham", "electrike",
+      "manectric", "plusle", "minun", "volbeat", "illumise", "roselia", "gulpin", "swalot", "carvanha", "sharpedo",
+      "wailmer", "wailord", "numel", "camerupt", "torkoal", "spoink", "grumpig", "spinda", "trapinch", "vibrava",
+      "flygon", "cacnea", "cacturne", "swablu", "altaria", "zangoose", "seviper", "lunatone", "solrock", "barboach",
+      "whiscash", "corphish", "crawdaunt", "baltoy", "claydol", "lileep", "cradily", "anorith", "armaldo", "feebas",
+      "milotic", "castform", "kecleon", "shuppet", "banette", "duskull", "dusclops", "tropius", "chimecho", "absol",
+      "wynaut", "snorunt", "glalie", "spheal", "sealeo", "walrein", "clamperl", "huntail", "gorebyss", "relicanth",
+      "luvdisc", "bagon", "shelgon", "salamence", "beldum", "metang", "metagross", "regirock", "regice", "registeel",
+      "latias", "latios", "kyogre", "groudon", "rayquaza", "jirachi", "deoxys", "turtwig", "grotle", "torterra",
+      "chimchar", "monferno", "infernape", "piplup", "prinplup", "empoleon", "starly", "staravia", "staraptor",
+      "bidoof", "bibarel", "kricketot", "kricketune", "shinx", "luxio", "luxray", "budew", "roserade", "cranidos",
+      "rampardos", "shieldon", "bastiodon", "burmy", "wormadam", "mothim", "combee", "vespiquen", "pachirisu", "buizel",
+      "floatzel", "cherubi", "cherrim", "shellos", "gastrodon", "ambipom", "drifloon", "drifblim", "buneary", "lopunny",
+      "mismagius", "honchkrow", "glameow", "purugly", "chingling", "stunky", "skuntank", "bronzor", "bronzong",
+      "bonsly", "mime jr.", "happiny", "chatot", "spiritomb", "gible", "gabite", "garchomp", "munchlax", "riolu",
+      "lucario", "hippopotas", "hippowdon", "skorupi", "drapion", "croagunk", "toxicroak", "carnivine", "finneon",
+      "lumineon", "mantyke", "snover", "abomasnow", "weavile", "magnezone", "lickilicky", "rhyperior", "tangrowth",
+      "electivire", "magmortar", "togekiss", "yanmega", "leafeon", "glaceon", "gliscor", "mamoswine", "porygon-z",
+      "gallade", "probopass", "dusknoir", "froslass", "rotom", "uxie", "mesprit", "azelf", "dialga", "palkia",
+      "heatran", "regigigas", "giratina", "cresselia", "phione", "manaphy", "darkrai", "shaymin", "arceus", "victini",
+      "snivy", "servine", "serperior", "tepig", "pignite", "emboar", "oshawott", "dewott", "samurott", "patrat",
+      "watchog", "lillipup", "herdier", "stoutland", "purrloin", "liepard", "pansage", "simisage", "pansear",
+      "simisear", "panpour", "simipour", "munna", "musharna", "pidove", "tranquill", "unfezant", "blitzle", "zebstrika",
+      "roggenrola", "boldore", "gigalith", "woobat", "swoobat", "drilbur", "excadrill", "audino", "timburr", "gurdurr",
+      "conkeldurr", "tympole", "palpitoad", "seismitoad", "throh", "sawk", "sewaddle", "swadloon", "leavanny",
+      "venipede", "whirlipede", "scolipede", "cottonee", "whimsicott", "petilil", "lilligant", "basculin", "sandile",
+      "krokorok", "krookodile", "darumaka", "darmanitan", "maractus", "dwebble", "crustle", "scraggy", "scrafty",
+      "sigilyph", "yamask", "cofagrigus", "tirtouga", "carracosta", "archen", "archeops", "trubbish", "garbodor",
+      "zorua", "zoroark", "minccino", "cinccino", "gothita", "gothorita", "gothitelle", "solosis", "duosion",
+      "reuniclus", "ducklett", "swanna", "vanillite", "vanillish", "vanilluxe", "deerling", "sawsbuck", "emolga",
+      "karrablast", "escavalier", "foongus", "amoonguss", "frillish", "jellicent", "alomomola", "joltik", "galvantula",
+      "ferroseed", "ferrothorn", "klink", "klang", "klinklang", "tynamo", "eelektrik", "eelektross", "elgyem",
+      "beheeyem", "litwick", "lampent", "chandelure", "axew", "fraxure", "haxorus", "cubchoo", "beartic", "cryogonal",
+      "shelmet", "accelgor", "stunfisk", "mienfoo", "mienshao", "druddigon", "golett", "golurk", "pawniard", "bisharp",
+      "bouffalant", "rufflet", "braviary", "vullaby", "mandibuzz", "heatmor", "durant", "deino", "zweilous",
+      "hydreigon", "larvesta", "volcarona", "cobalion", "terrakion", "virizion", "tornadus", "thundurus", "reshiram",
+      "zekrom", "landorus", "kyurem", "keldeo", "meloetta", "genesect", "chespin", "quilladin", "chesnaught",
+      "fennekin", "braixen", "delphox", "froakie", "frogadier", "greninja", "bunnelby", "diggersby", "fletchling",
+      "fletchinder", "talonflame", "scatterbug", "spewpa", "vivillon", "litleo", "pyroar", "flabb", "floette",
+      "florges", "skiddo", "gogoat", "pancham", "pangoro", "furfrou", "espurr", "meowstic", "honedge", "doublade",
+      "aegislash", "spritzee", "aromatisse", "swirlix", "slurpuff", "inkay", "malamar", "binacle", "barbaracle",
+      "skrelp", "dragalge", "clauncher", "clawitzer", "helioptile", "heliolisk", "tyrunt", "tyrantrum", "amaura",
+      "aurorus", "sylveon", "hawlucha", "dedenne", "carbink", "goomy", "sliggoo", "goodra", "klefki", "phantump",
+      "trevenant", "pumpkaboo", "gourgeist", "bergmite", "avalugg", "noibat", "noivern", "xerneas", "yveltal",
+      "zygarde", "diancie", "hoopa" };
 
   public static ScoreSheet runTests(ScoreSheet scoreSheet) throws IOException {
     Properties properties = new Properties();
@@ -100,6 +173,240 @@ public class Tests {
     return sb.toString().trim();
   }
 
+  /**
+   * Graders, you should only edit this. No more.
+   *
+   * @param scoreSheet
+   * @return
+   * @throws IOException
+   */
+  private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
+    testAvlMap(scoreSheet);
+    testSeparateChainingMap(scoreSheet);
+    testBwogBot(scoreSheet);
+    return scoreSheet;
+  }
+
+  private static void testAvlMap(ScoreSheet scoreSheet) {
+    AvlMap<String, Integer> map = new AvlMap<String, Integer>();
+
+    String sectionName;
+    int sectionScoreMax;
+
+    sectionName = "AvlMap.put(): added 4 items";
+    sectionScoreMax = 6;
+    try {
+      for (int i = 0; i < 4; i++) {
+        map.put(pokemons[i], i);
+      }
+      scoreSheet.addSection(sectionName, 6, sectionScoreMax, "");
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "AvlMap.get(): correct values for 4 added items";
+    sectionScoreMax = 6;
+    try {
+      boolean passed = true;
+      for (int i = 0; i < 4; i++) {
+        if (map.get(pokemons[i]) != i) {
+          passed = false;
+        }
+      }
+      if (passed) {
+        scoreSheet.addSection(sectionName, 6, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Wrong values from get()");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "AvlMap.put(): added same 4 keys with different values";
+    sectionScoreMax = 8;
+    try {
+      for (int i = 0; i < 12; i++) {
+        map.put(pokemons[i % 4], i);
+      }
+      scoreSheet.addSection(sectionName, 8, sectionScoreMax, "");
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "AvlMap.get(): correct values for 4 keys with overwritten values";
+    sectionScoreMax = 7;
+    try {
+      boolean passed = true;
+      for (int i = 8; i < 12; i++) {
+        if (map.get(pokemons[i % 4]) != i) {
+          passed = false;
+        }
+      }
+      if (passed) {
+        scoreSheet.addSection(sectionName, 8, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Wrong values from get()");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+  }
+
+  private static void testSeparateChainingMap(ScoreSheet scoreSheet) {
+    SeparateChainingMap<String, Integer> map = new SeparateChainingMap<String, Integer>();
+
+    String sectionName;
+    int sectionScoreMax;
+
+    sectionName = "SeparateChainingMap.put(): added same 4 keys with different values";
+    sectionScoreMax = 6;
+    try {
+      for (int i = 0; i < 12; i++) {
+        map.put(pokemons[i % 4], i);
+      }
+      scoreSheet.addSection(sectionName, 6, sectionScoreMax, "");
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "SeparateChainingMap.get(): correct values for 4 keys with overwritten values";
+    sectionScoreMax = 6;
+    try {
+      boolean passed = true;
+      for (int i = 8; i < 12; i++) {
+        if (map.get(pokemons[i % 4]) != i) {
+          passed = false;
+        }
+      }
+      if (passed) {
+        scoreSheet.addSection(sectionName, 6, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Wrong values from get()");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "SeparateChainingMap.getSize(): correct value returned for 4 keys";
+    sectionScoreMax = 3;
+    try {
+      if (map.getSize() == 4) {
+        scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Wrong value from getSize()");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "SeparateChainingMap.getTableSize(): correct value returned for 4 keys";
+    sectionScoreMax = 3;
+    try {
+      if (map.getTableSize() == 8) {
+        scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Wrong value from getTableSize()");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "SeparateChainingMap.upsize(): table sized increased correctly";
+    sectionScoreMax = 7;
+    try {
+      for (int i = 0; i < pokemons.length; i++) {
+        map.put(pokemons[i], i);
+      }
+      if (map.getTableSize() == 1024) {
+        scoreSheet.addSection(sectionName, 7, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
+            "tableSize should be 1024 after 720 puts with different keys");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "SeparateChainingMap.upsize(): all gets still functions correctly after upsizing";
+    sectionScoreMax = 3;
+    try {
+      boolean passed = true;
+      for (int i = 0; i < pokemons.length; i++) {
+        if (i != map.get(pokemons[i])) {
+          passed = false;
+        }
+      }
+      if (passed) {
+        scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "get() does not return correct values after upsize()");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+  }
+
+  private static void testBwogBot(ScoreSheet scoreSheet) {
+    BwogBot bot = new BwogBot();
+
+    String sectionName;
+    int sectionScoreMax;
+
+    sectionName = "BwogBot.readFile(): reads file without exceptions thrown";
+    sectionScoreMax = 10;
+    try {
+      bot.readFile("comments.txt");
+      scoreSheet.addSection(sectionName, 10, sectionScoreMax, "");
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "BwogBot.getMap(): returns a valid map";
+    sectionScoreMax = 3;
+    try {
+      Map<String, Integer> map = bot.getMap();
+      if (map instanceof AvlMap<?, ?>) {
+        scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
+      } else if (map instanceof SeparateChainingMap<?, ?>) {
+        scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "getMap() did not return a valid Map");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "BwogBot.getCount(): returns correct counts";
+    sectionScoreMax = 7;
+    try {
+      if (bot.getCount("hamdel") == 3 && bot.getCount("hodor") == 43732 && bot.getCount("bwog") == 455
+          && bot.getCount("bacchanal") == 92) {
+        scoreSheet.addSection(sectionName, 7, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
+            "Wrong counts. This may not (and probably isn't) the fault of getCount. Are you sure your readFile() is correct?");
+      }
+
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+
+    sectionName = "BwogBot.getNMostPopularWords(): returns correct words";
+    sectionScoreMax = 7;
+    try {
+      List<String> mostPopular = Arrays.asList(new String[] { "hodor", "the", "to", "a", "is" });
+      List<String> botMostPopular = bot.getNMostPopularWords(5);
+      if (compareCollections(mostPopular, botMostPopular)) {
+        scoreSheet.addSection(sectionName, 10, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
+            "getNMostPopularWords() did not return correct top n words");
+      }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+  }
+
   private static <T> boolean compareCollections(Collection<T> l1, Collection<T> l2) {
     if (l1.size() != l2.size()) {
       return false;
@@ -113,291 +420,5 @@ public class Tests {
       }
     }
     return true;
-  }
-
-  /**
-   * Graders, you should only edit this. No more.
-   *
-   * @param scoreSheet
-   * @return
-   * @throws IOException
-   */
-  private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
-
-    testBST(scoreSheet);
-    testTrie(scoreSheet);
-
-    return scoreSheet;
-  }
-
-  private static void testBST(ScoreSheet scoreSheet) {
-    String sectionString;
-    int maxScore;
-
-    BinarySearchTree<Integer> bst = new BinarySearchTree<Integer>();
-
-    // isBst (test 1)
-
-    sectionString = "BinarySearchTree.isBst(): returns true on an empty BST";
-    maxScore = 3;
-
-    try {
-      if (bst.isBst()) {
-        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
-      } else {
-        scoreSheet.addSection(sectionString, 0, maxScore, "returns false on an empty BST");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
-    }
-
-    // isBst (test 2)
-
-    sectionString = "BinarySearchTree.isBst(): returns true on a BST built by inserting values";
-    maxScore = 4;
-
-    int[] vals = { 5, 3, 7, 2, 4, 6, 8 };
-    for (Integer val : vals) {
-      bst.insert(val);
-    }
-
-    try {
-      if (bst.isBst()) {
-        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
-      } else {
-        scoreSheet.addSection(sectionString, 0, maxScore, "returns false on a valid BST");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
-    }
-
-    // isBst (test 3)
-    // TODO (can't build invalid BST with private BinaryNode class)
-
-    sectionString = "BinarySearchTree.isBst(): returns false on an invalid BST built with the constructor";
-    maxScore = 4;
-
-    BinarySearchTree<Integer> nonBst = new BinarySearchTree<Integer>();
-
-    try {
-      if (true) {
-        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
-      } else {
-        scoreSheet.addSection(sectionString, 0, maxScore, "returns true on an invalid BST");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
-    }
-
-    // getInterval (test 1)
-
-    sectionString = "BinarySearchTree.getInterval(): bst contains no elements in interval";
-    maxScore = 3;
-
-    List<Integer> expected = new LinkedList<Integer>();
-
-    try {
-      if (bst.getInterval(10, 12).equals(expected)) {
-        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
-      } else {
-        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect interval");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
-    }
-
-    // getInterval (test 2)
-
-    sectionString = "BinarySearchTree.getInterval(): bst contains some elements in interval";
-    maxScore = 4;
-
-    HashSet<Integer> expectedSet = new HashSet<>();
-    for (int i = 4; i < 7; i++) {
-      expectedSet.add(i);
-    }
-
-    try {
-      HashSet<Integer> studentSet = new HashSet<>(bst.getInterval(4, 6));
-      if (studentSet.equals(expectedSet)) {
-        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
-      } else {
-        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect interval");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
-    }
-
-    // getInterval (test 3)
-
-    sectionString = "BinarySearchTree.getInterval(): bst contains all elements in interval";
-    maxScore = 4;
-
-    expectedSet = new HashSet<Integer>();
-    for (int i = 2; i < 4; i++) {
-      expectedSet.add(i);
-    }
-
-    try {
-      HashSet<Integer> studentSet = new HashSet<>(bst.getInterval(0, 3));
-      if (studentSet.equals(expectedSet)) {
-        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
-      } else {
-        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect interval");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
-    }
-
-    // iterator (test 1)
-
-    sectionString = "BinarySearchTree.iterator(): returns postorder traversal of bst";
-    maxScore = 11;
-
-    List<Integer> actual = new LinkedList<>();
-    for (int i : bst) {
-      actual.add(i);
-    }
-
-    expected = new LinkedList<>();
-    int[] expectedArray = { 2, 4, 3, 6, 8, 7, 5 };
-    for (int i : expectedArray) {
-      expected.add(i);
-    }
-
-    try {
-      if (actual.equals(expected)) {
-        scoreSheet.addSection(sectionString, maxScore, maxScore, "");
-      } else {
-        scoreSheet.addSection(sectionString, 0, maxScore, "incorrect postorder traversal");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionString, 0, maxScore, stackTraceToString(e));
-    }
-  }
-
-  private static void testTrie(ScoreSheet scoreSheet) throws IOException {
-    BufferedReader bufferedReader = new BufferedReader(new FileReader("dictionary.txt"));
-    String line;
-
-    HashSet<String> dictionary = new HashSet<>();
-    while ((line = bufferedReader.readLine()) != null) {
-      dictionary.add(line);
-    }
-
-    bufferedReader.close();
-
-    Trie trie = new Trie();
-
-    // empty check contains returns correctly
-    try {
-      if (!trie.contains("pikachu")) {
-        scoreSheet.addSection("Trie.contains(): empty trie returns false", 2, 2, "");
-      } else {
-        scoreSheet.addSection("Trie.contains(): empty trie returns false", 0, 2, "Empty trie returned true for a word");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.contains(): empty trie returns false", 0, 2, stackTraceToString(e));
-    }
-
-    // empty return list size 0
-    try {
-      if (trie.getStrings().size() == 0) {
-        scoreSheet.addSection("Trie.getStrings(): empty trie returns list of size 0", 2, 2, "");
-      } else {
-        scoreSheet.addSection("Trie.getStrings(): empty trie returns list of size 0", 0, 2,
-            "Empty trie did not return list of size 0");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.getStrings(): empty trie returns list of size 0", 0, 2, stackTraceToString(e));
-    }
-
-    // empty returns list size 0
-    try {
-      if (trie.getStartsWith("rat").size() == 0) {
-        scoreSheet.addSection("Trie.getStartsWith(): empty trie returns list of size 0", 2, 2, "");
-      } else {
-        scoreSheet.addSection("Trie.getStartsWith(): empty trie returns list of size 0", 0, 2,
-            "Empty trie did not return list of size 0");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.getStartsWith(): empty trie returns list of size 0", 0, 2, stackTraceToString(e));
-    }
-
-    // add words
-    try {
-      for (String word : dictionary) {
-        trie.addWord(word);
-      }
-      scoreSheet.addSection("Trie.addWord(): added many words", 11, 11, "");
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.addWord(): added many words", 0, 11, stackTraceToString(e));
-    }
-
-    // contains rattata
-    try {
-      if (trie.contains("rattata")) {
-        scoreSheet.addSection("Trie.contains(): returns true for added word", 5, 5, "");
-      } else {
-        scoreSheet.addSection("Trie.contains(): returns true for added word", 0, 5, "Did not return true");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.contains(): returns true for added word", 0, 5, stackTraceToString(e));
-    }
-
-    // does not contains rat
-    try {
-      if (!trie.contains("rat")) {
-        scoreSheet.addSection("Trie.contains(): returns false for non-added word", 4, 4, "");
-      } else {
-        scoreSheet.addSection("Trie.contains(): returns false for non-added word", 0, 4, "Did not return false");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.contains(): returns false for non-added word", 0, 4, stackTraceToString(e));
-    }
-
-    // get back list of added words
-    try {
-      HashSet<String> trieDictionary = new HashSet<String>(trie.getStrings());
-
-      if (dictionary.equals(trieDictionary)) {
-        scoreSheet.addSection("Trie.getStrings(): returns all added words", 9, 9, "");
-      } else {
-        scoreSheet.addSection("Trie.getStrings(): returns all added words", 0, 9, "Did not return all words correctly");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.getStrings(): returns all added words", 0, 9, stackTraceToString(e));
-    }
-
-    // getStartsWith pid
-    try {
-      String[] pids = { "pidgey", "pidgeotto", "pidgeot", "pidove", "pidgeotmega" };
-      HashSet<String> pid = new HashSet<String>(Arrays.asList(pids));
-      HashSet<String> pidTrie = new HashSet<String>(trie.getStartsWith("pid"));
-      if (pid.equals(pidTrie)) {
-        scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a certain prefix", 5, 5, "");
-      } else {
-        scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a certain prefix", 0, 5,
-            "Did not return words correctly");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a certain prefix", 0, 5,
-          stackTraceToString(e));
-    }
-
-    // getStartsWith mew. notice that mew itself is a word
-    try {
-      String[] mews = { "mew", "mewtwo", "mewtwomegax", "mewtwomegay" };
-      HashSet<String> mew = new HashSet<String>(Arrays.asList(mews));
-      HashSet<String> mewTrie = new HashSet<String>(trie.getStartsWith("mew"));
-      if (mew.equals(mewTrie)) {
-        scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a prefix which is also a word", 4, 4, "");
-      } else {
-        scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a prefix which is also a word", 0, 4,
-            "Did not return words correctly");
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection("Trie.getStartsWith(): returns words starting with a prefix which is also a word", 0, 4,
-          stackTraceToString(e));
-    }
   }
 }
