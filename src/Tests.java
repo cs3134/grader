@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -193,11 +194,39 @@ public class Tests {
     File folder = new File("./" + scoreSheet.homeworkName.replaceAll("hw", "") + "/");
     File[] listOfFiles = folder.listFiles();
 
+    HashSet<String> ignoredFileNames = new HashSet<>();
+    ignoredFileNames.add("readme.md");
+    ignoredFileNames.add("comments.txt");
+
+    HashSet<String> acceptedFileExtensions = new HashSet<>();
+    acceptedFileExtensions.add("txt");
+    acceptedFileExtensions.add("pdf");
+    acceptedFileExtensions.add("md");
+
+    int maxFileSize = 1000;
+
     for (int i = 0; i < listOfFiles.length; i++) {
       if (listOfFiles[i].isFile()) {
-        System.out.println("File " + listOfFiles[i].getName());
+        String fileName = listOfFiles[i].getName().toLowerCase();
+        if (!ignoredFileNames.contains(fileName)) {
+          if (acceptedFileExtensions.contains(getExtension(fileName))) {
+            // found file
+            System.out.println("Found file: " + fileName);
+            System.out.println("Size: " + listOfFiles[i].length());
+          }
+        }
       }
     }
+  }
+
+  private static String getExtension(String fileName) {
+    String extension = "";
+
+    int i = fileName.lastIndexOf('.');
+    if (i > 0) {
+      extension = fileName.substring(i + 1);
+    }
+    return extension;
   }
 
   private static void testAvlMap(ScoreSheet scoreSheet) {
