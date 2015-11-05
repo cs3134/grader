@@ -190,7 +190,7 @@ public class Tests {
   }
 
   private static void searchTheory(ScoreSheet scoreSheet) {
-    File folder = new File("./" + scoreSheet.homeworkName + "/");
+    File folder = new File("./" + scoreSheet.homeworkName.replaceAll("hw", "") + "/");
     File[] listOfFiles = folder.listFiles();
 
     for (int i = 0; i < listOfFiles.length; i++) {
