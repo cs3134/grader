@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
@@ -165,7 +166,7 @@ public class Tests {
       sb.append(element.toString());
       sb.append("\n");
       stackTraceCount++;
-      if (stackTraceCount > 5) {
+      if (stackTraceCount > 2) {
         sb.append("Stack trace redacted...");
         return sb.toString().trim();
       }
@@ -181,10 +182,22 @@ public class Tests {
    * @throws IOException
    */
   private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
+    searchTheory(scoreSheet);
     testAvlMap(scoreSheet);
     testSeparateChainingMap(scoreSheet);
     testBwogBot(scoreSheet);
     return scoreSheet;
+  }
+
+  private static void searchTheory(ScoreSheet scoreSheet) {
+    File folder = new File("./" + scoreSheet.homeworkName + "/");
+    File[] listOfFiles = folder.listFiles();
+
+    for (int i = 0; i < listOfFiles.length; i++) {
+      if (listOfFiles[i].isFile()) {
+        System.out.println("File " + listOfFiles[i].getName());
+      }
+    }
   }
 
   private static void testAvlMap(ScoreSheet scoreSheet) {
