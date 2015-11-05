@@ -203,7 +203,10 @@ public class Tests {
     acceptedFileExtensions.add("pdf");
     acceptedFileExtensions.add("md");
 
-    int maxFileSize = 1000;
+    long maxFileSize = 600000; // 500kb
+
+    String sectionName = "Theory: ";
+    int sectionScoreMax = 24;
 
     for (int i = 0; i < listOfFiles.length; i++) {
       if (listOfFiles[i].isFile()) {
@@ -211,12 +214,22 @@ public class Tests {
         if (!ignoredFileNames.contains(fileName)) {
           if (acceptedFileExtensions.contains(getExtension(fileName))) {
             // found file
-            System.out.println("Found file: " + fileName);
+            System.out.println("Found theory file: " + fileName);
             System.out.println("Size: " + listOfFiles[i].length());
+            if (listOfFiles[i].length() > maxFileSize) {
+              scoreSheet.addSection(sectionName + fileName + " found", 0, sectionScoreMax,
+                  "Your theory file is too big (>500kb). Please resubmit.");
+              return;
+            } else {
+              scoreSheet.addSection(sectionName + fileName + " found", 24, sectionScoreMax, "");
+              return;
+            }
           }
         }
       }
     }
+    scoreSheet.addSection(sectionName + "no theory submission detected", 0, sectionScoreMax,
+        "We could not find your theory submission in the /4/ folder. Please place it in the folder (and not in /src/ or /bin/ or any other folders)");
   }
 
   private static String getExtension(String fileName) {
