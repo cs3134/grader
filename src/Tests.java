@@ -218,7 +218,7 @@ public class Tests {
             System.out.println("Size: " + listOfFiles[i].length());
             if (listOfFiles[i].length() > maxFileSize) {
               scoreSheet.addSection(sectionName + fileName + " found", 0, sectionScoreMax,
-                  fileName + " (" + (fileName.length/1000) + "kb) exceeds max file size of 500kb.");
+                  fileName + " (" + (listOfFiles[i].length()/1000) + "kb) exceeds max file size of 500kb.");
               return;
             } else {
               scoreSheet.addSection(sectionName + fileName + " found", 24, sectionScoreMax, "");
