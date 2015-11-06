@@ -249,12 +249,12 @@ public class Tests {
     int sectionScoreMax;
 
     sectionName = "AvlMap.put(): added 4 items";
-    sectionScoreMax = 6;
+    sectionScoreMax = 7;
     try {
       for (int i = 0; i < 4; i++) {
         map.put(pokemons[i], i);
       }
-      scoreSheet.addSection(sectionName, 6, sectionScoreMax, "");
+      scoreSheet.addSection(sectionName, 7, sectionScoreMax, "");
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }
