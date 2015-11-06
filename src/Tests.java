@@ -298,7 +298,7 @@ public class Tests {
         }
       }
       if (passed) {
-        scoreSheet.addSection(sectionName, 8, sectionScoreMax, "");
+        scoreSheet.addSection(sectionName, 7, sectionScoreMax, "");
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Wrong values from get()");
       }
