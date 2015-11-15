@@ -1,4 +1,4 @@
-cp -r ./4/src/* ./
+cp -r ./5/src/* ./
 javac -cp "./commons-codec-1.9.jar:./commons-logging-1.2.jar:./fluent-hc-4.5.1.jar:./httpclient-4.5.1.jar:./httpclient-cache-4.5.1.jar:./httpclient-win-4.5.1.jar:./httpcore-4.4.3.jar:./httpmime-4.5.1.jar:./jna-4.1.0.jar:./jna-platform-4.1.0.jar:./jsonsimple.jar:." *.java
 timeout 30s java -cp "./commons-codec-1.9.jar:./commons-logging-1.2.jar:./fluent-hc-4.5.1.jar:./httpclient-4.5.1.jar:./httpclient-cache-4.5.1.jar:./httpclient-win-4.5.1.jar:./httpcore-4.4.3.jar:./httpmime-4.5.1.jar:./jna-4.1.0.jar:./jna-platform-4.1.0.jar:./jsonsimple.jar:." Grader
 
@@ -16,6 +16,6 @@ if [ $status -eq -1 ]; then
   curl -H "Content-Type: application/json" -X POST -d "{\"reponame\": \"$CIRCLE_PROJECT_REPONAME\", \"errorMessage\": \"You exceeded the memory limit (4GB). The results of this build are likely invalid. You are probably caught in an infinite loop somewhere.\"}" http://jarvis.xyz/webhook/curl
 fi
 
-echo "HW deadline over"
+# echo "HW deadline over"
 
 exit
