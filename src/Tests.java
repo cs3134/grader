@@ -145,7 +145,7 @@ public class Tests {
             System.out.println("Size: " + listOfFiles[i].length());
             if (listOfFiles[i].length() > maxFileSize) {
               scoreSheet.addSection(sectionName + fileName + " found", 0, sectionScoreMax,
-                                    fileName + " (" + (listOfFiles[i].length() / 1000) + "kb) exceeds max file size of 500kb.");
+                  fileName + " (" + (listOfFiles[i].length() / 1000) + "kb) exceeds max file size of 500kb.");
               return;
             } else {
               scoreSheet.addSection(sectionName + fileName + " found", 40, sectionScoreMax, "");
@@ -156,7 +156,8 @@ public class Tests {
       }
     }
     scoreSheet.addSection(sectionName + "no theory submission detected", 0, sectionScoreMax,
-                          "We could not find your theory submission in the " + "./" + scoreSheet.homeworkName.replaceAll("hw", "") + "/ folder. Please place it in the folder (and not in /src/ or /bin/ or any other folders)");
+        "We could not find your theory submission in the " + "./" + scoreSheet.homeworkName.replaceAll("hw", "")
+            + "/ folder. Please place it in the folder (and not in /src/ or /bin/ or any other folders)");
   }
 
   private static String getExtension(String fileName) {
@@ -198,7 +199,7 @@ public class Tests {
         scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
+            "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -224,7 +225,7 @@ public class Tests {
         scoreSheet.addSection(sectionName, 4, sectionScoreMax, "");
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
+            "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -242,7 +243,7 @@ public class Tests {
         scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
+            "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -267,7 +268,7 @@ public class Tests {
         scoreSheet.addSection(sectionName, 10, sectionScoreMax, "");
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + gold + "\nActual: " + input);
+            "List incorrect\nExpected: " + Arrays.toString(gold) + "\nActual: " + Arrays.toString(input));
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -287,7 +288,7 @@ public class Tests {
         scoreSheet.addSection(sectionName, 10, sectionScoreMax, "");
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + gold + "\nActual: " + input);
+            "List incorrect\nExpected: " + Arrays.toString(gold) + "\nActual: " + Arrays.toString(input));
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -317,7 +318,7 @@ public class Tests {
         }
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
+            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -342,7 +343,7 @@ public class Tests {
         }
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
+            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -367,7 +368,7 @@ public class Tests {
         }
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
+            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -391,7 +392,7 @@ public class Tests {
         }
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
+            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
@@ -415,7 +416,7 @@ public class Tests {
         }
       } else {
         scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-                              "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
+            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
       }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
