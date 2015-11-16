@@ -260,7 +260,7 @@ public class Tests {
       Collections.shuffle(inputList);
       Integer[] input = new Integer[8];
       inputList.toArray(input);
-      MergeSort.mergeSort(input);
+      MergeSort.mergeSortB(input);
       Integer[] gold = new Integer[8];
       IntStream.range(1, 9).boxed().collect(Collectors.toList()).toArray(gold);
       if (Arrays.equals(input, gold)) {
