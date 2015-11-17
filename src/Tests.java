@@ -94,7 +94,7 @@ public class Tests {
       sb.append(element.toString());
       sb.append("\n");
       stackTraceCount++;
-      if (stackTraceCount > 2) {
+      if (stackTraceCount > 6) {
         sb.append("Stack trace redacted...");
         return sb.toString().trim();
       }
