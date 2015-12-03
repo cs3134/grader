@@ -3,12 +3,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -16,8 +16,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -94,7 +92,7 @@ public class Tests {
       sb.append(element.toString());
       sb.append("\n");
       stackTraceCount++;
-      if (stackTraceCount > 6) {
+      if (stackTraceCount > 2) {
         sb.append("Stack trace redacted...");
         return sb.toString().trim();
       }
@@ -110,20 +108,26 @@ public class Tests {
    * @throws IOException
    */
   private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
-    searchTheory(scoreSheet);
-    testKBest(scoreSheet);
-    testIterativeMergeSort(scoreSheet);
-    testMergeSortList(scoreSheet);
+     searchTheory(scoreSheet);
+    testUndirectedEdges(scoreSheet);
+    testReadMap(scoreSheet);
+    testComputeEuclideanCost(scoreSheet);
+    testComputeAllEuclideanCosts(scoreSheet);
+    testBfs(scoreSheet);
+    testDijkstra(scoreSheet);
+    testPrim(scoreSheet);
     return scoreSheet;
   }
 
   private static void searchTheory(ScoreSheet scoreSheet) {
     File folder = new File("./" + scoreSheet.homeworkName.replaceAll("hw", "") + "/");
     File[] listOfFiles = folder.listFiles();
-
     HashSet<String> ignoredFileNames = new HashSet<>();
     ignoredFileNames.add("readme.md");
-    ignoredFileNames.add("comments.txt");
+    ignoredFileNames.add("ttredges_test.txt");
+    ignoredFileNames.add("ttredges.txt");
+    ignoredFileNames.add("ttrvertices_test.txt");
+    ignoredFileNames.add("ttrvertices.txt");
 
     HashSet<String> acceptedFileExtensions = new HashSet<>();
     acceptedFileExtensions.add("txt");
@@ -133,7 +137,7 @@ public class Tests {
     long maxFileSize = 600000; // 500kb
 
     String sectionName = "Theory: ";
-    int sectionScoreMax = 40;
+    int sectionScoreMax = 30;
 
     for (int i = 0; i < listOfFiles.length; i++) {
       if (listOfFiles[i].isFile()) {
@@ -148,7 +152,7 @@ public class Tests {
                   fileName + " (" + (listOfFiles[i].length() / 1000) + "kb) exceeds max file size of 500kb.");
               return;
             } else {
-              scoreSheet.addSection(sectionName + fileName + " found", 40, sectionScoreMax, "");
+              scoreSheet.addSection(sectionName + fileName + " found", 30, sectionScoreMax, "");
               return;
             }
           }
@@ -170,254 +174,289 @@ public class Tests {
     return extension;
   }
 
-  private static void testKBest(ScoreSheet scoreSheet) {
-    String sectionName;
+  private static void testUndirectedEdges(ScoreSheet scoreSheet) {
+    String sectionName = "addUndirectedEdge";
     int sectionScoreMax;
-
-    // less than k
-    sectionName = "KBestCounter.count(): added x counts without exceptions thrown (x < k)";
-    sectionScoreMax = 5;
-
-    int k = 5;
-    List<Integer> numbers = Arrays.asList(new Integer[] { 1, 2, 3 });
-    KBestCounter<Integer> counter = new KBestCounter<>(k);
+    sectionScoreMax = 8;
     try {
-      numbers.stream().forEach(x -> {
-        counter.count(x);
-      });
-      scoreSheet.addSection(sectionName, 5, sectionScoreMax, "");
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-
-    sectionName = "KBestCounter.kbest(): returned x largest elements (x < k) after x counts";
-    sectionScoreMax = 3;
-    try {
-      List<Integer> kbestStudent = counter.kbest();
-      List<Integer> kbestGold = Arrays.asList(new Integer[] { 3, 2, 1 });
-      if (compareCollections(kbestStudent, kbestGold)) {
-        scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
+      Graph g = new Graph();
+      g.addUndirectedEdge("a", "b", 5.0);
+      Vertex v1 = g.vertices.get("a");
+      Vertex v2 = g.vertices.get("b");
+      boolean found1 = false;
+      boolean found2 = false;
+      for (Edge e : v1.getEdges())
+        if (e.targetVertex == v2 && e.cost == 5.0)
+          found1 = true;
+      for (Edge e : v2.getEdges())
+        if (e.targetVertex == v1 && e.cost == 5.0)
+          found2 = true;
+      if (!found1 || !found2) {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Missing edges or incorrect weights.");
+        return;
       }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-
-    sectionName = "KBestCounter.count(): added x counts without exceptions thrown (x > k)";
-    sectionScoreMax = 5;
-    try {
-      for (int i = 4; i < 100; i++) {
-        counter.count(i);
+      g.addUndirectedEdge("a", "c", 2.0);
+      if (g.vertices.values().size() != 3) {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Second edge on the same node incorrect.");
+        return;
       }
-      scoreSheet.addSection(sectionName, 5, sectionScoreMax, "");
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-
-    sectionName = "KBestCounter.kbest(): kbest() still returns correctly after adding more elements";
-    sectionScoreMax = 4;
-    try {
-      List<Integer> kbestStudent = counter.kbest();
-      List<Integer> kbestGold = Arrays.asList(new Integer[] { 99, 98, 97, 96, 95 });
-      if (compareCollections(kbestStudent, kbestGold)) {
-        scoreSheet.addSection(sectionName, 4, sectionScoreMax, "");
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
+      found1 = false;
+      found2 = false;
+      v1 = g.vertices.get("a");
+      v2 = g.vertices.get("c");
+      for (Edge e : v1.getEdges())
+        if (e.targetVertex == v2 && e.cost == 2.0)
+          found1 = true;
+      for (Edge e : v2.getEdges())
+        if (e.targetVertex == v1 && e.cost == 2.0)
+          found2 = true;
+      if (!found1 || !found2) {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Second edge on the same node incorrect.");
+        return;
       }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-
-    sectionName = "KBestCounter.kbest(): Added two more elements, kbest() should return new list";
-    sectionScoreMax = 3;
-    try {
-      counter.count(101);
-      counter.count(102);
-      counter.count(100);
-      List<Integer> kbestStudent = counter.kbest();
-      List<Integer> kbestGold = Arrays.asList(new Integer[] { 102, 101, 100, 99, 98 });
-      if (compareCollections(kbestStudent, kbestGold)) {
-        scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + kbestGold + "\nActual: " + kbestStudent);
-      }
+      scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }
   }
 
-  private static void testIterativeMergeSort(ScoreSheet scoreSheet) {
-    String sectionName;
+  private static void testReadMap(ScoreSheet scoreSheet) {
+    String sectionName = "MapReader.readGraph";
     int sectionScoreMax;
-
-    sectionName = "MergeSort.mergeSortB(): correct result for power 2 sized input array";
-    sectionScoreMax = 10;
+    sectionScoreMax = 13;
     try {
-      List<Integer> inputList = IntStream.range(1, 9).boxed().collect(Collectors.toList());
-      Collections.shuffle(inputList);
-      Integer[] input = new Integer[8];
-      inputList.toArray(input);
-      MergeSort.mergeSortB(input);
-      Integer[] gold = new Integer[8];
-      IntStream.range(1, 9).boxed().collect(Collectors.toList()).toArray(gold);
-      if (Arrays.equals(input, gold)) {
-        scoreSheet.addSection(sectionName, 10, sectionScoreMax, "");
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + Arrays.toString(gold) + "\nActual: " + Arrays.toString(input));
+      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
+      int notfound = 4;
+      for (Vertex v : g.getVertices()) {
+        if (v.name.equals("Denver")) {
+          for (Edge e : v.getEdges()) {
+            if (e.targetVertex.name.equals("Seattle") || e.targetVertex.name.equals("SanFrancisco")
+                || e.targetVertex.name.equals("Nashville") || e.targetVertex.name.equals("Montreal"))
+              notfound--;
+            else {
+              scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Found invalid edge in read graph.");
+              return;
+            }
+          }
+          break;
+        }
       }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-
-    sectionName = "MergeSort.mergeSortB(): correct result for non-power 2 sized input array";
-    sectionScoreMax = 10;
-    try {
-      List<Integer> inputList = IntStream.range(1, 12).boxed().collect(Collectors.toList());
-      Collections.shuffle(inputList);
-      Integer[] input = new Integer[11];
-      inputList.toArray(input);
-      MergeSort.mergeSortB(input);
-      Integer[] gold = new Integer[11];
-      IntStream.range(1, 12).boxed().collect(Collectors.toList()).toArray(gold);
-      if (Arrays.equals(input, gold)) {
-        scoreSheet.addSection(sectionName, 10, sectionScoreMax, "");
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + Arrays.toString(gold) + "\nActual: " + Arrays.toString(input));
+      if (notfound > 0) {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Missing edge in read graph.");
+        return;
       }
+      scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
+      return;
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }
   }
 
-  private static void testMergeSortList(ScoreSheet scoreSheet) {
-    String sectionName;
+  private static void testComputeEuclideanCost(ScoreSheet scoreSheet) {
+    String sectionName = "testComputeEuclideanCost";
     int sectionScoreMax;
-
-    sectionName = "MergeSort.mergeLists(): merges two ascending lists, each size 1, correctly";
-    sectionScoreMax = 3;
-    try {
-      List<Integer> left = Arrays.asList(new Integer[] { 1 });
-      List<Integer> leftGold = new LinkedList<Integer>(left);
-      List<Integer> right = Arrays.asList(new Integer[] { 2 });
-      List<Integer> rightGold = new LinkedList<Integer>(right);
-      List<Integer> resultGold = Arrays.asList(new Integer[] { 1, 2 });
-
-      List<Integer> resultStudent = MergeSort.mergeLists(left, right);
-
-      if (compareCollections(resultStudent, resultGold)) {
-        if (compareCollections(left, leftGold) && compareCollections(right, rightGold)) {
-          scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
-        } else {
-          scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Original left and right lists modified during merge");
-        }
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-
-    sectionName = "MergeSort.mergeLists(): merges two ascending lists of same sizes correctly";
-    sectionScoreMax = 4;
-    try {
-      List<Integer> left = Arrays.asList(new Integer[] { 1, 3 });
-      List<Integer> leftGold = new LinkedList<Integer>(left);
-      List<Integer> right = Arrays.asList(new Integer[] { 2, 4 });
-      List<Integer> rightGold = new LinkedList<Integer>(right);
-      List<Integer> resultGold = Arrays.asList(new Integer[] { 1, 2, 3, 4 });
-
-      List<Integer> resultStudent = MergeSort.mergeLists(left, right);
-
-      if (compareCollections(resultStudent, resultGold)) {
-        if (compareCollections(left, leftGold) && compareCollections(right, rightGold)) {
-          scoreSheet.addSection(sectionName, 4, sectionScoreMax, "");
-        } else {
-          scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Original left and right lists modified during merge");
-        }
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-
-    sectionName = "MergeSort.mergeLists(): merges two ascending lists of different sizes correctly";
-    sectionScoreMax = 3;
-    try {
-      List<Integer> left = Arrays.asList(new Integer[] { 1, 3, 5, 6 });
-      List<Integer> leftGold = new LinkedList<Integer>(left);
-      List<Integer> right = Arrays.asList(new Integer[] { 2, 4 });
-      List<Integer> rightGold = new LinkedList<Integer>(right);
-      List<Integer> resultGold = Arrays.asList(new Integer[] { 1, 2, 3, 4, 5, 6 });
-
-      List<Integer> resultStudent = MergeSort.mergeLists(left, right);
-
-      if (compareCollections(resultStudent, resultGold)) {
-        if (compareCollections(left, leftGold) && compareCollections(right, rightGold)) {
-          scoreSheet.addSection(sectionName, 3, sectionScoreMax, "");
-        } else {
-          scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Original left and right lists modified during merge");
-        }
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
-      }
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-
-    sectionName = "MergeSort.sortList(): correct result for power 2 sized list";
     sectionScoreMax = 5;
     try {
-      List<Integer> inputList = IntStream.range(1, 9).boxed().collect(Collectors.toList());
-      Collections.shuffle(inputList);
-      List<Integer> inputGold = new LinkedList<Integer>(inputList);
-      List<Integer> resultGold = IntStream.range(1, 9).boxed().collect(Collectors.toList());
-
-      List<Integer> resultStudent = MergeSort.sortList(inputList);
-
-      if (compareCollections(resultStudent, resultGold)) {
-        if (compareCollections(inputList, inputGold)) {
-          scoreSheet.addSection(sectionName, 5, sectionScoreMax, "");
-        } else {
-          scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Original left and right lists modified during merge");
-        }
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
-      }
+      Graph g = new Graph();
+      double result = g.computeEuclideanCost(12.1, 3.5, 7.0, 123.0);
+      if (result < 119.60877894201578 || result > 119.60877894201580)
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Incorrect result.");
+      else
+        scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }
+  }
 
-    sectionName = "MergeSort.sortList(): correct result for non-power 2 sized list";
+  private static void testComputeAllEuclideanCosts(ScoreSheet scoreSheet) {
+    String sectionName = "testComputeAllEuclideanCost";
+    int sectionScoreMax;
     sectionScoreMax = 5;
     try {
-      List<Integer> inputList = IntStream.range(1, 12).boxed().collect(Collectors.toList());
-      Collections.shuffle(inputList);
-      List<Integer> inputGold = new LinkedList<Integer>(inputList);
-      List<Integer> resultGold = IntStream.range(1, 12).boxed().collect(Collectors.toList());
-
-      List<Integer> resultStudent = MergeSort.sortList(inputList);
-
-      if (compareCollections(resultStudent, resultGold)) {
-        if (compareCollections(inputList, inputGold)) {
-          scoreSheet.addSection(sectionName, 5, sectionScoreMax, "");
-        } else {
-          scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Original left and right lists modified during merge");
+      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
+      g.computeAllEuclideanCosts();
+      int incorrect = 3;
+      for (Vertex v : g.getVertices()) {
+        if (v.name.equals("Denver")) {
+          for (Edge e : v.getEdges()) {
+            if (e.targetVertex.name.equals("Seattle") && e.cost > 279.401145309034 && e.cost < 279.401145309035) {
+              incorrect--;
+            }
+            if (e.targetVertex.name.equals("Montreal") && e.cost > 454.963734818501 && e.cost < 454.963734818502) {
+              incorrect--;
+            }
+          }
         }
-      } else {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
-            "List incorrect\nExpected: " + resultGold + "\nActual: " + resultStudent);
+        if (v.name.equals("Seattle"))
+          for (Edge e : v.getEdges())
+            if (e.targetVertex.name.equals("Denver") && e.cost > 279.401145309034 && e.cost < 279.401145309035)
+              incorrect--;
       }
+      if (incorrect > 0)
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Incorrect euclidean edge costs.");
+      else
+        scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
+  }
+
+  private static void testBfs(ScoreSheet scoreSheet) {
+    Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
+
+    String sectionName = "doBfs";
+    StringBuilder errors = new StringBuilder();
+    int sectionScoreMax = 13;
+    int score = 13;
+    g.doBfs("Houston");
+    // Test shortest path costs
+    if (g.vertices.get("Houston").cost != 0.0 || g.vertices.get("Montreal").cost != 3.0
+        || g.vertices.get("Seattle").cost != 3.0) {
+      score = score - 8;
+      errors.append("Invalid cost annotations.");
+    }
+    for (Vertex v : g.getVertices())
+      if (!v.visited) {
+        score = score - 8;
+        errors.append(" Unvisited vertices.");
+      }
+
+    if (g.vertices.get("Houston").backpointer != null || !(g.vertices.get("Montreal").backpointer.name.equals("Denver"))
+        || !(g.vertices.get("Denver").backpointer.name.equals("Nashville"))
+        || (!g.vertices.get("Nashville").backpointer.name.equals("Houston"))) {
+      score = score - 8;
+      errors.append(" Incorrect backpointers.");
+    }
+
+    g = MapReader.readGraph("ttrvertices.txt", "ttredges.txt");
+    g.doBfs("Calgary");
+    LinkedList<String> path = new LinkedList<String>();
+    Vertex u = g.vertices.get("NewYork");
+    path.addFirst(u.name);
+    while (u.backpointer != null) {
+      u = u.backpointer;
+      path.addFirst(u.name);
+    }
+    String[] goldList = { "Calgary", "Winnipeg", "SaultSaintMarie", "Montreal", "NewYork" };
+    if (!compareCollections(path, Arrays.asList(goldList))) {
+      score = score - 8;
+      errors.append("Incorrect shortest path between Houston and Montreal. Should be " + Arrays.toString(goldList));
+    }
+    ;
+
+    if (score < 0)
+      score = 0;
+    scoreSheet.addSection(sectionName, score, sectionScoreMax, errors.toString());
+
+  }
+
+  private static void testDijkstra(ScoreSheet scoreSheet) {
+    Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
+
+    String sectionName = "doDijkstra";
+    StringBuilder errors = new StringBuilder();
+    int sectionScoreMax = 13;
+    int score = 13;
+    g.computeAllEuclideanCosts();
+    g.doDijkstra("Houston");
+
+    // Test shortest path costs
+    if (g.vertices.get("Houston").cost != 0.0 || (g.vertices.get("Nashville").cost < 162.788)
+        || (g.vertices.get("Nashville").cost > 162.789) || (g.vertices.get("Pittsburgh").cost < 305.966)
+        || (g.vertices.get("Pittsburgh").cost > 305.967) || (g.vertices.get("NewYork").cost < 375.428)
+        || (g.vertices.get("NewYork").cost > 375.429) || (g.vertices.get("Montreal").cost < 474.509)
+        || (g.vertices.get("Montreal").cost > 474.510)) {
+
+      score = score - 8;
+      errors.append("Invalid cost annotations.");
+    }
+    for (Vertex v : g.getVertices())
+      if (!v.visited) {
+        score = score - 8;
+        errors.append("Unvisited vertices.");
+      }
+
+    if (g.vertices.get("Houston").backpointer != null
+        || !(g.vertices.get("Montreal").backpointer.name.equals("NewYork"))
+        || !(g.vertices.get("NewYork").backpointer.name.equals("Pittsburgh"))
+        || (!g.vertices.get("Pittsburgh").backpointer.name.equals("Nashville"))
+        || (!g.vertices.get("Nashville").backpointer.name.equals("Houston"))) {
+      score = score - 8;
+      errors.append(" Incorrect backpointers.");
+    }
+
+    g = MapReader.readGraph("ttrvertices.txt", "ttredges.txt");
+    g.computeAllEuclideanCosts();
+    g.doDijkstra("Calgary");
+    LinkedList<String> path = new LinkedList<String>();
+    Vertex u = g.vertices.get("NewYork");
+    path.addFirst(u.name);
+    while (u.backpointer != null) {
+      u = u.backpointer;
+      path.addFirst(u.name);
+    }
+    String[] goldList = { "Calgary", "Winnipeg", "Duluth", "Chicago", "Pittsburgh", "NewYork" };
+    if (!compareCollections(path, Arrays.asList(goldList))) {
+      score = score - 8;
+      errors.append("Incorrect shortest path between Houston and Montreal. Should be " + Arrays.toString(goldList));
+    }
+    ;
+
+    if (score < 0)
+      score = 0;
+    scoreSheet.addSection(sectionName, score, sectionScoreMax, errors.toString());
+  }
+
+  private static void testPrim(ScoreSheet scoreSheet) {
+    String sectionName = "doPrim";
+    StringBuilder errors = new StringBuilder();
+    int sectionScoreMax = 13;
+    try {
+      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
+
+      g.computeAllEuclideanCosts();
+      g.doPrim("Denver");
+
+      double sum = 0.0;
+      HashMap<String, HashSet<String>> tree = new HashMap<>();
+      String vname;
+      String pname;
+      for (Vertex v : g.getVertices()) {
+        vname = v.name;
+        if (v.backpointer != null) {
+          pname = v.backpointer.name;
+          sum = sum + v.cost;
+          if (!tree.containsKey(pname))
+            tree.put(pname, new HashSet<>());
+          tree.get(pname).add(vname);
+        }
+      }
+
+      Set<String> seen = new HashSet();
+      LinkedList<String> stack = new LinkedList<>();
+      stack.push("Denver");
+      String next;
+      boolean has_cycle = false;
+
+      while (!stack.isEmpty()) {
+        next = stack.pop();
+        seen.add(next);
+        if (tree.containsKey(next))
+          for (String child : tree.get(next)) {
+            if (seen.contains(child))
+              has_cycle = true;
+            stack.push(child);
+          }
+      }
+      if (has_cycle || (seen.size() < g.vertices.size())) {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Result is not a spanning tree.");
+        return;
+      }
+      if (sum > 1675.40589624302) {
+        scoreSheet.addSection(sectionName, 5, sectionScoreMax, "Spanning tree is not minimal.");
+        return;
+      }
+      scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }

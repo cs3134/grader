@@ -1,0 +1,15 @@
+Montreal,696,66
+Seattle,76,123
+Boston,750,110
+NewYork,700,165
+Denver,300,290
+Pittsburgh,640,200
+Washington,716,240
+SanFrancisco,50,315
+Raleigh,700,285
+Nashville,580,330
+LasVegas,160,350
+Atlanta,640,360
+LosAngeles,111,395
+Houston,470,450
+Miami,700,460
