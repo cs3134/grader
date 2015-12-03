@@ -108,7 +108,7 @@ public class Tests {
    * @throws IOException
    */
   private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
-     searchTheory(scoreSheet);
+    searchTheory(scoreSheet);
     testUndirectedEdges(scoreSheet);
     testReadMap(scoreSheet);
     testComputeEuclideanCost(scoreSheet);
@@ -302,109 +302,119 @@ public class Tests {
   }
 
   private static void testBfs(ScoreSheet scoreSheet) {
-    Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
-
     String sectionName = "doBfs";
-    StringBuilder errors = new StringBuilder();
     int sectionScoreMax = 13;
-    int score = 13;
-    g.doBfs("Houston");
-    // Test shortest path costs
-    if (g.vertices.get("Houston").cost != 0.0 || g.vertices.get("Montreal").cost != 3.0
-        || g.vertices.get("Seattle").cost != 3.0) {
-      score = score - 8;
-      errors.append("Invalid cost annotations.");
-    }
-    for (Vertex v : g.getVertices())
-      if (!v.visited) {
+
+    try {
+      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
+
+      StringBuilder errors = new StringBuilder();
+      int score = 13;
+      g.doBfs("Houston");
+      // Test shortest path costs
+      if (g.vertices.get("Houston").cost != 0.0 || g.vertices.get("Montreal").cost != 3.0
+          || g.vertices.get("Seattle").cost != 3.0) {
         score = score - 8;
-        errors.append(" Unvisited vertices.");
+        errors.append("Invalid cost annotations.");
+      }
+      for (Vertex v : g.getVertices())
+        if (!v.visited) {
+          score = score - 8;
+          errors.append(" Unvisited vertices.");
+        }
+
+      if (g.vertices.get("Houston").backpointer != null
+          || !(g.vertices.get("Montreal").backpointer.name.equals("Denver"))
+          || !(g.vertices.get("Denver").backpointer.name.equals("Nashville"))
+          || (!g.vertices.get("Nashville").backpointer.name.equals("Houston"))) {
+        score = score - 8;
+        errors.append(" Incorrect backpointers.");
       }
 
-    if (g.vertices.get("Houston").backpointer != null || !(g.vertices.get("Montreal").backpointer.name.equals("Denver"))
-        || !(g.vertices.get("Denver").backpointer.name.equals("Nashville"))
-        || (!g.vertices.get("Nashville").backpointer.name.equals("Houston"))) {
-      score = score - 8;
-      errors.append(" Incorrect backpointers.");
-    }
-
-    g = MapReader.readGraph("ttrvertices.txt", "ttredges.txt");
-    g.doBfs("Calgary");
-    LinkedList<String> path = new LinkedList<String>();
-    Vertex u = g.vertices.get("NewYork");
-    path.addFirst(u.name);
-    while (u.backpointer != null) {
-      u = u.backpointer;
+      g = MapReader.readGraph("ttrvertices.txt", "ttredges.txt");
+      g.doBfs("Calgary");
+      LinkedList<String> path = new LinkedList<String>();
+      Vertex u = g.vertices.get("NewYork");
       path.addFirst(u.name);
-    }
-    String[] goldList = { "Calgary", "Winnipeg", "SaultSaintMarie", "Montreal", "NewYork" };
-    if (!compareCollections(path, Arrays.asList(goldList))) {
-      score = score - 8;
-      errors.append("Incorrect shortest path between Houston and Montreal. Should be " + Arrays.toString(goldList));
-    }
-    ;
+      while (u.backpointer != null) {
+        u = u.backpointer;
+        path.addFirst(u.name);
+      }
+      String[] goldList = { "Calgary", "Winnipeg", "SaultSaintMarie", "Montreal", "NewYork" };
+      if (!compareCollections(path, Arrays.asList(goldList))) {
+        score = score - 8;
+        errors.append("Incorrect shortest path between Houston and Montreal. Should be " + Arrays.toString(goldList));
+      }
+      ;
 
-    if (score < 0)
-      score = 0;
-    scoreSheet.addSection(sectionName, score, sectionScoreMax, errors.toString());
+      if (score < 0)
+        score = 0;
+      scoreSheet.addSection(sectionName, score, sectionScoreMax, errors.toString());
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
 
   }
 
   private static void testDijkstra(ScoreSheet scoreSheet) {
-    Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
-
     String sectionName = "doDijkstra";
     StringBuilder errors = new StringBuilder();
     int sectionScoreMax = 13;
     int score = 13;
-    g.computeAllEuclideanCosts();
-    g.doDijkstra("Houston");
+    try {
+      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
 
-    // Test shortest path costs
-    if (g.vertices.get("Houston").cost != 0.0 || (g.vertices.get("Nashville").cost < 162.788)
-        || (g.vertices.get("Nashville").cost > 162.789) || (g.vertices.get("Pittsburgh").cost < 305.966)
-        || (g.vertices.get("Pittsburgh").cost > 305.967) || (g.vertices.get("NewYork").cost < 375.428)
-        || (g.vertices.get("NewYork").cost > 375.429) || (g.vertices.get("Montreal").cost < 474.509)
-        || (g.vertices.get("Montreal").cost > 474.510)) {
+      g.computeAllEuclideanCosts();
+      g.doDijkstra("Houston");
 
-      score = score - 8;
-      errors.append("Invalid cost annotations.");
-    }
-    for (Vertex v : g.getVertices())
-      if (!v.visited) {
+      // Test shortest path costs
+      if (g.vertices.get("Houston").cost != 0.0 || (g.vertices.get("Nashville").cost < 162.788)
+          || (g.vertices.get("Nashville").cost > 162.789) || (g.vertices.get("Pittsburgh").cost < 305.966)
+          || (g.vertices.get("Pittsburgh").cost > 305.967) || (g.vertices.get("NewYork").cost < 375.428)
+          || (g.vertices.get("NewYork").cost > 375.429) || (g.vertices.get("Montreal").cost < 474.509)
+          || (g.vertices.get("Montreal").cost > 474.510)) {
+
         score = score - 8;
-        errors.append("Unvisited vertices.");
+        errors.append("Invalid cost annotations.");
+      }
+      for (Vertex v : g.getVertices())
+        if (!v.visited) {
+          score = score - 8;
+          errors.append("Unvisited vertices.");
+        }
+
+      if (g.vertices.get("Houston").backpointer != null
+          || !(g.vertices.get("Montreal").backpointer.name.equals("NewYork"))
+          || !(g.vertices.get("NewYork").backpointer.name.equals("Pittsburgh"))
+          || (!g.vertices.get("Pittsburgh").backpointer.name.equals("Nashville"))
+          || (!g.vertices.get("Nashville").backpointer.name.equals("Houston"))) {
+        score = score - 8;
+        errors.append(" Incorrect backpointers.");
       }
 
-    if (g.vertices.get("Houston").backpointer != null
-        || !(g.vertices.get("Montreal").backpointer.name.equals("NewYork"))
-        || !(g.vertices.get("NewYork").backpointer.name.equals("Pittsburgh"))
-        || (!g.vertices.get("Pittsburgh").backpointer.name.equals("Nashville"))
-        || (!g.vertices.get("Nashville").backpointer.name.equals("Houston"))) {
-      score = score - 8;
-      errors.append(" Incorrect backpointers.");
-    }
-
-    g = MapReader.readGraph("ttrvertices.txt", "ttredges.txt");
-    g.computeAllEuclideanCosts();
-    g.doDijkstra("Calgary");
-    LinkedList<String> path = new LinkedList<String>();
-    Vertex u = g.vertices.get("NewYork");
-    path.addFirst(u.name);
-    while (u.backpointer != null) {
-      u = u.backpointer;
+      g = MapReader.readGraph("ttrvertices.txt", "ttredges.txt");
+      g.computeAllEuclideanCosts();
+      g.doDijkstra("Calgary");
+      LinkedList<String> path = new LinkedList<String>();
+      Vertex u = g.vertices.get("NewYork");
       path.addFirst(u.name);
-    }
-    String[] goldList = { "Calgary", "Winnipeg", "Duluth", "Chicago", "Pittsburgh", "NewYork" };
-    if (!compareCollections(path, Arrays.asList(goldList))) {
-      score = score - 8;
-      errors.append("Incorrect shortest path between Houston and Montreal. Should be " + Arrays.toString(goldList));
-    }
-    ;
+      while (u.backpointer != null) {
+        u = u.backpointer;
+        path.addFirst(u.name);
+      }
+      String[] goldList = { "Calgary", "Winnipeg", "Duluth", "Chicago", "Pittsburgh", "NewYork" };
+      if (!compareCollections(path, Arrays.asList(goldList))) {
+        score = score - 8;
+        errors.append("Incorrect shortest path between Houston and Montreal. Should be " + Arrays.toString(goldList));
+      }
+      ;
 
-    if (score < 0)
-      score = 0;
-    scoreSheet.addSection(sectionName, score, sectionScoreMax, errors.toString());
+      if (score < 0)
+        score = 0;
+      scoreSheet.addSection(sectionName, score, sectionScoreMax, errors.toString());
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
   }
 
   private static void testPrim(ScoreSheet scoreSheet) {
