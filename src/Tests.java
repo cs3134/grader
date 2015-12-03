@@ -343,7 +343,7 @@ public class Tests {
       String[] goldList = { "Calgary", "Winnipeg", "SaultSaintMarie", "Montreal", "NewYork" };
       if (!compareCollections(path, Arrays.asList(goldList))) {
         score = score - 8;
-        errors.append("Incorrect shortest path between Houston and Montreal. Should be " + Arrays.toString(goldList));
+        errors.append("Incorrect shortest path between Calgary and NewYork. Should be " + Arrays.toString(goldList));
       }
       ;
 
