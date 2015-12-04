@@ -57,7 +57,8 @@ public class Tests {
       System.out.println(scoreSheet.toJSONString());
       System.exit(0);
     } catch (TimeoutException e) {
-      postJson(scoreSheet);
+      // postJson(scoreSheet);
+      System.out.println("Timeout Exception Run");
       System.out.println(scoreSheet.toJSONString());
       System.exit(0);
     }
