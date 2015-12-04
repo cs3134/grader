@@ -66,7 +66,8 @@ public class Tests {
     if (!executor.isTerminated()) {
       executor.shutdownNow();
     }
-
+    
+    System.out.println("Reached end of Tests");
     postJson(scoreSheet);
 
     return scoreSheet;

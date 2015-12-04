@@ -1,6 +1,6 @@
 cp -r ./6/src/* ./
 javac -cp "./commons-codec-1.9.jar:./commons-logging-1.2.jar:./fluent-hc-4.5.1.jar:./httpclient-4.5.1.jar:./httpclient-cache-4.5.1.jar:./httpclient-win-4.5.1.jar:./httpcore-4.4.3.jar:./httpmime-4.5.1.jar:./jna-4.1.0.jar:./jna-platform-4.1.0.jar:./jsonsimple.jar:." *.java
-timeout 15s java -cp "./commons-codec-1.9.jar:./commons-logging-1.2.jar:./fluent-hc-4.5.1.jar:./httpclient-4.5.1.jar:./httpclient-cache-4.5.1.jar:./httpclient-win-4.5.1.jar:./httpcore-4.4.3.jar:./httpmime-4.5.1.jar:./jna-4.1.0.jar:./jna-platform-4.1.0.jar:./jsonsimple.jar:." Grader
+java -cp "./commons-codec-1.9.jar:./commons-logging-1.2.jar:./fluent-hc-4.5.1.jar:./httpclient-4.5.1.jar:./httpclient-cache-4.5.1.jar:./httpclient-win-4.5.1.jar:./httpcore-4.4.3.jar:./httpmime-4.5.1.jar:./jna-4.1.0.jar:./jna-platform-4.1.0.jar:./jsonsimple.jar:." Grader
 
 status=$?
 
