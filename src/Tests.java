@@ -57,8 +57,7 @@ public class Tests {
       System.out.println(scoreSheet.toJSONString());
       System.exit(0);
     } catch (TimeoutException e) {
-      // postJson(scoreSheet);
-      System.out.println("Timeout Exception Run");
+      postJson(scoreSheet);
       System.out.println(scoreSheet.toJSONString());
       System.exit(0);
     }
@@ -66,8 +65,7 @@ public class Tests {
     if (!executor.isTerminated()) {
       executor.shutdownNow();
     }
-    
-    System.out.println("Reached end of Tests");
+
     postJson(scoreSheet);
 
     return scoreSheet;
