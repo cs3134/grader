@@ -108,14 +108,14 @@ public class Tests {
    * @throws IOException
    */
   private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
-    searchTheory(scoreSheet);
+    // searchTheory(scoreSheet);
     testUndirectedEdges(scoreSheet);
     testReadMap(scoreSheet);
     testComputeEuclideanCost(scoreSheet);
     testComputeAllEuclideanCosts(scoreSheet);
     testBfs(scoreSheet);
-    testDijkstra(scoreSheet);
-    testPrim(scoreSheet);
+    // testDijkstra(scoreSheet);
+    // testPrim(scoreSheet);
     return scoreSheet;
   }
 
