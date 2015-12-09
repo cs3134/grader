@@ -147,7 +147,7 @@ public class Tests {
                   fileName + " (" + (listOfFiles[i].length() / 1000) + "kb) exceeds max file size of 500kb.");
               return;
             } else {
-              scoreSheet.addSection(sectionName + fileName + " found", 30, sectionScoreMax, "");
+              scoreSheet.addSection(sectionName + fileName + " found", sectionScoreMax, sectionScoreMax, "");
               return;
             }
           }
