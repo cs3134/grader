@@ -109,13 +109,8 @@ public class Tests {
    */
   private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
     // searchTheory(scoreSheet);
-    testUndirectedEdges(scoreSheet);
-    testReadMap(scoreSheet);
-    testComputeEuclideanCost(scoreSheet);
-    testComputeAllEuclideanCosts(scoreSheet);
-    testBfs(scoreSheet);
-    // testDijkstra(scoreSheet);
-    // testPrim(scoreSheet);
+    testSuperSoda(scoreSheet);
+
     return scoreSheet;
   }
 
@@ -137,7 +132,7 @@ public class Tests {
     long maxFileSize = 600000; // 500kb
 
     String sectionName = "Theory: ";
-    int sectionScoreMax = 30;
+    int sectionScoreMax = 42;
 
     for (int i = 0; i < listOfFiles.length; i++) {
       if (listOfFiles[i].isFile()) {
@@ -174,302 +169,94 @@ public class Tests {
     return extension;
   }
 
-  private static void testUndirectedEdges(ScoreSheet scoreSheet) {
-    String sectionName = "addUndirectedEdge";
+  private static void testSuperSoda(ScoreSheet scoreSheet) {
+    String sectionName;
     int sectionScoreMax;
-    sectionScoreMax = 8;
-    try {
-      Graph g = new Graph();
-      g.addUndirectedEdge("a", "b", 5.0);
-      Vertex v1 = g.vertices.get("a");
-      Vertex v2 = g.vertices.get("b");
-      boolean found1 = false;
-      boolean found2 = false;
-      for (Edge e : v1.getEdges())
-        if (e.targetVertex == v2 && e.cost == 5.0)
-          found1 = true;
-      for (Edge e : v2.getEdges())
-        if (e.targetVertex == v1 && e.cost == 5.0)
-          found2 = true;
-      if (!found1 || !found2) {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Missing edges or incorrect weights.");
-        return;
-      }
-      g.addUndirectedEdge("a", "c", 2.0);
-      if (g.vertices.values().size() != 3) {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Second edge on the same node incorrect.");
-        return;
-      }
-      found1 = false;
-      found2 = false;
-      v1 = g.vertices.get("a");
-      v2 = g.vertices.get("c");
-      for (Edge e : v1.getEdges())
-        if (e.targetVertex == v2 && e.cost == 2.0)
-          found1 = true;
-      for (Edge e : v2.getEdges())
-        if (e.targetVertex == v1 && e.cost == 2.0)
-          found2 = true;
-      if (!found1 || !found2) {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Second edge on the same node incorrect.");
-        return;
-      }
-      scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-  }
 
-  private static void testReadMap(ScoreSheet scoreSheet) {
-    String sectionName = "MapReader.readGraph";
-    int sectionScoreMax;
-    sectionScoreMax = 13;
-    try {
-      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
-      int notfound = 4;
-      for (Vertex v : g.getVertices()) {
-        if (v.name.equals("Denver")) {
-          for (Edge e : v.getEdges()) {
-            if (e.targetVertex.name.equals("Seattle") || e.targetVertex.name.equals("SanFrancisco")
-                || e.targetVertex.name.equals("Nashville") || e.targetVertex.name.equals("Montreal"))
-              notfound--;
-            else {
-              scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Found invalid edge in read graph.");
-              return;
-            }
-          }
-          break;
-        }
-      }
-      if (notfound > 0) {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Missing edge in read graph.");
-        return;
-      }
-      scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
-      return;
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-  }
+    int[] sodaSizes = new int[] { 1, 6, 12, 25, 36 };
+    double[] costs = new double[] { 0.8, 4, 7.5, 14, 20 };
+    double errorMargin = 0.00001;
 
-  private static void testComputeEuclideanCost(ScoreSheet scoreSheet) {
-    String sectionName = "testComputeEuclideanCost";
-    int sectionScoreMax;
-    sectionScoreMax = 5;
+    // minimum soda cost
+    sectionName = "SuperSoda.minimalSodaCost: n = 100";
+    sectionScoreMax = 10;
     try {
-      Graph g = new Graph();
-      double result = g.computeEuclideanCost(12.1, 3.5, 7.0, 123.0);
-      if (result < 119.60877894201578 || result > 119.60877894201580)
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Incorrect result.");
-      else
+      double student = SuperSoda.minimalSodaCost(sodaSizes, costs, 100);
+      double correct = 56.0;
+      if (doubleEquals(correct, student, errorMargin)) {
         scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
+            "Wrong value\nActual: " + student + "\nExpected: " + correct);
+      }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }
-  }
 
-  private static void testComputeAllEuclideanCosts(ScoreSheet scoreSheet) {
-    String sectionName = "testComputeAllEuclideanCost";
-    int sectionScoreMax;
-    sectionScoreMax = 5;
+    sectionName = "SuperSoda.minimalSodaCost: n = 1337";
+    sectionScoreMax = 19;
     try {
-      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
-      g.computeAllEuclideanCosts();
-      int incorrect = 3;
-      for (Vertex v : g.getVertices()) {
-        if (v.name.equals("Denver")) {
-          for (Edge e : v.getEdges()) {
-            if (e.targetVertex.name.equals("Seattle") && e.cost > 279.401145309034 && e.cost < 279.401145309035) {
-              incorrect--;
-            }
-            if (e.targetVertex.name.equals("Montreal") && e.cost > 454.963734818501 && e.cost < 454.963734818502) {
-              incorrect--;
-            }
-          }
-        }
-        if (v.name.equals("Seattle"))
-          for (Edge e : v.getEdges())
-            if (e.targetVertex.name.equals("Denver") && e.cost > 279.401145309034 && e.cost < 279.401145309035)
-              incorrect--;
-      }
-      if (incorrect > 0)
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Incorrect euclidean edge costs.");
-      else
+      double student = SuperSoda.minimalSodaCost(sodaSizes, costs, 1337);
+      double correct = 743.6;
+      if (doubleEquals(correct, student, errorMargin)) {
         scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
+            "Wrong value\nActual: " + student + "\nExpected: " + correct);
+      }
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }
-  }
 
-  private static void testBfs(ScoreSheet scoreSheet) {
-    String sectionName = "doBfs";
-    int sectionScoreMax = 13;
-
+    sectionName = "SuperSoda.maximumSodaNumber: cost = 25";
+    sectionScoreMax = 10;
     try {
-      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
-
-      StringBuilder errors = new StringBuilder();
-      int score = 13;
-      g.doBfs("Houston");
-      // Test shortest path costs
-      if (g.vertices.get("Houston").cost != 0.0 || g.vertices.get("Montreal").cost != 3.0
-          || g.vertices.get("Seattle").cost != 3.0) {
-        score = score - 8;
-        errors.append("Invalid cost annotations.");
+      int student = SuperSoda.maximumSodaNumber(sodaSizes, costs, 25);
+      int correct = 43;
+      if (student == correct) {
+        scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
+            "Wrong value\nActual: " + student + "\nExpected: " + correct);
       }
-      for (Vertex v : g.getVertices())
-        if (!v.visited) {
-          score = score - 8;
-          errors.append(" Unvisited vertices.");
-        }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
 
-      if (g.vertices.get("Houston").backpointer != null
-          || !(g.vertices.get("Montreal").backpointer.name.equals("Denver"))
-          || !(g.vertices.get("Denver").backpointer.name.equals("Nashville"))
-          || (!g.vertices.get("Nashville").backpointer.name.equals("Houston"))) {
-        score = score - 8;
-        errors.append(" Incorrect backpointers.");
+    sectionName = "SuperSoda.maximumSodaNumber: cost = 52.8";
+    sectionScoreMax = 19;
+    try {
+      int student = SuperSoda.maximumSodaNumber(sodaSizes, costs, 52.8);
+      int correct = 93;
+      if (student == correct) {
+        scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
+            "Wrong value\nActual: " + student + "\nExpected: " + correct);
       }
+    } catch (Exception e) {
+      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
+    }
 
-      g = MapReader.readGraph("ttrvertices.txt", "ttredges.txt");
-      g.doBfs("Calgary");
-      LinkedList<String> path = new LinkedList<String>();
-      Vertex u = g.vertices.get("NewYork");
-      path.addFirst(u.name);
-      while (u.backpointer != null) {
-        u = u.backpointer;
-        path.addFirst(u.name);
+    sectionName = "SuperSoda.minimalSodaCostCombinations: n = 1337";
+    sectionScoreMax = 20;
+    try {
+      int[] student = SuperSoda.minimalSodaCostCombinations(sodaSizes, costs, 1337);
+      int[] correct = new int[] { 2, 0, 0, 3, 35 };
+      if (Arrays.equals(student, correct)) {
+        scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
+      } else {
+        scoreSheet.addSection(sectionName, 0, sectionScoreMax,
+            "Wrong value\nActual: " + Arrays.toString(student) + "\nExpected: " + Arrays.toString(correct));
       }
-      String[] goldList = { "Calgary", "Winnipeg", "SaultSaintMarie", "Montreal", "NewYork" };
-      if (!compareCollections(path, Arrays.asList(goldList))) {
-        score = score - 8;
-        errors.append("Incorrect shortest path between Calgary and NewYork. Should be " + Arrays.toString(goldList));
-      }
-      ;
-
-      if (score < 0)
-        score = 0;
-      scoreSheet.addSection(sectionName, score, sectionScoreMax, errors.toString());
     } catch (Exception e) {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }
 
   }
 
-  private static void testDijkstra(ScoreSheet scoreSheet) {
-    String sectionName = "doDijkstra";
-    StringBuilder errors = new StringBuilder();
-    int sectionScoreMax = 13;
-    int score = 13;
-    try {
-      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
-
-      g.computeAllEuclideanCosts();
-      g.doDijkstra("Houston");
-
-      // Test shortest path costs
-      if (g.vertices.get("Houston").cost != 0.0 || (g.vertices.get("Nashville").cost < 162.788)
-          || (g.vertices.get("Nashville").cost > 162.789) || (g.vertices.get("Pittsburgh").cost < 305.966)
-          || (g.vertices.get("Pittsburgh").cost > 305.967) || (g.vertices.get("NewYork").cost < 375.428)
-          || (g.vertices.get("NewYork").cost > 375.429) || (g.vertices.get("Montreal").cost < 474.509)
-          || (g.vertices.get("Montreal").cost > 474.510)) {
-
-        score = score - 8;
-        errors.append("Invalid cost annotations.");
-      }
-      for (Vertex v : g.getVertices())
-        if (!v.visited) {
-          score = score - 8;
-          errors.append("Unvisited vertices.");
-        }
-
-      if (g.vertices.get("Houston").backpointer != null
-          || !(g.vertices.get("Montreal").backpointer.name.equals("NewYork"))
-          || !(g.vertices.get("NewYork").backpointer.name.equals("Pittsburgh"))
-          || (!g.vertices.get("Pittsburgh").backpointer.name.equals("Nashville"))
-          || (!g.vertices.get("Nashville").backpointer.name.equals("Houston"))) {
-        score = score - 8;
-        errors.append(" Incorrect backpointers.");
-      }
-
-      g = MapReader.readGraph("ttrvertices.txt", "ttredges.txt");
-      g.computeAllEuclideanCosts();
-      g.doDijkstra("Calgary");
-      LinkedList<String> path = new LinkedList<String>();
-      Vertex u = g.vertices.get("NewYork");
-      path.addFirst(u.name);
-      while (u.backpointer != null) {
-        u = u.backpointer;
-        path.addFirst(u.name);
-      }
-      String[] goldList = { "Calgary", "Winnipeg", "Duluth", "Chicago", "Pittsburgh", "NewYork" };
-      if (!compareCollections(path, Arrays.asList(goldList))) {
-        score = score - 8;
-        errors.append("Incorrect shortest path between Houston and Montreal. Should be " + Arrays.toString(goldList));
-      }
-      ;
-
-      if (score < 0)
-        score = 0;
-      scoreSheet.addSection(sectionName, score, sectionScoreMax, errors.toString());
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
-  }
-
-  private static void testPrim(ScoreSheet scoreSheet) {
-    String sectionName = "doPrim";
-    StringBuilder errors = new StringBuilder();
-    int sectionScoreMax = 13;
-    try {
-      Graph g = MapReader.readGraph("ttrvertices_test.txt", "ttredges_test.txt");
-
-      g.computeAllEuclideanCosts();
-      g.doPrim("Denver");
-
-      double sum = 0.0;
-      HashMap<String, HashSet<String>> tree = new HashMap<>();
-      String vname;
-      String pname;
-      for (Vertex v : g.getVertices()) {
-        vname = v.name;
-        if (v.backpointer != null) {
-          pname = v.backpointer.name;
-          sum = sum + v.cost;
-          if (!tree.containsKey(pname))
-            tree.put(pname, new HashSet<>());
-          tree.get(pname).add(vname);
-        }
-      }
-
-      Set<String> seen = new HashSet();
-      LinkedList<String> stack = new LinkedList<>();
-      stack.push("Denver");
-      String next;
-      boolean has_cycle = false;
-
-      while (!stack.isEmpty()) {
-        next = stack.pop();
-        seen.add(next);
-        if (tree.containsKey(next))
-          for (String child : tree.get(next)) {
-            if (seen.contains(child))
-              has_cycle = true;
-            stack.push(child);
-          }
-      }
-      if (has_cycle || (seen.size() < g.vertices.size())) {
-        scoreSheet.addSection(sectionName, 0, sectionScoreMax, "Result is not a spanning tree.");
-        return;
-      }
-      if (sum > 1675.40589624302) {
-        scoreSheet.addSection(sectionName, 5, sectionScoreMax, "Spanning tree is not minimal.");
-        return;
-      }
-      scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
-    } catch (Exception e) {
-      scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
-    }
+  private static boolean doubleEquals(double a, double b, double epsilon) {
+    return (Math.abs(a - b) < epsilon);
   }
 
   private static <T> boolean compareCollections(Collection<T> l1, Collection<T> l2) {
