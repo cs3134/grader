@@ -108,7 +108,7 @@ public class Tests {
    * @throws IOException
    */
   private static ScoreSheet tests(ScoreSheet scoreSheet) throws IOException {
-    // searchTheory(scoreSheet);
+    searchTheory(scoreSheet);
     testSuperSoda(scoreSheet);
 
     return scoreSheet;
