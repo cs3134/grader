@@ -223,10 +223,10 @@ public class Tests {
       scoreSheet.addSection(sectionName, 0, sectionScoreMax, stackTraceToString(e));
     }
 
-    sectionName = "SuperSoda.maximumSodaNumber: cost = 52.8";
+    sectionName = "SuperSoda.maximumSodaNumber: cost = 53.0";
     sectionScoreMax = 19;
     try {
-      int student = SuperSoda.maximumSodaNumber(sodaSizes, costs, 52.8);
+      int student = SuperSoda.maximumSodaNumber(sodaSizes, costs, 53.0);
       int correct = 93;
       if (student == correct) {
         scoreSheet.addSection(sectionName, sectionScoreMax, sectionScoreMax, "");
